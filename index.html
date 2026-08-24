@@ -2,9 +2,10 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
   <title>Portafolio & Proyectos | Ivan (musicallyivan)</title>
-  <meta name="description" content="Portafolio interactivo con estilo Glassmorphism de todos mis proyectos y repositorios de GitHub." />
+  <meta name="description" content="Portafolio interactivo con estilo Glassmorphism de todos mis proyectos y repositorios de GitHub. Adaptado para cualquier tipo de dispositivo." />
+  <meta name="theme-color" content="#060814" />
 
   <!-- Google Fonts & Font Awesome Icons -->
   <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -20,14 +21,14 @@
   <!-- =========================================================================
        1. AMBIENT BACKGROUND & MESH GLOW ORBS
        ========================================================================= -->
-  <div class="ambient-background">
+  <div class="ambient-background" aria-hidden="true">
     <div class="glow-orb orb-1"></div>
     <div class="glow-orb orb-2"></div>
     <div class="glow-orb orb-3"></div>
     <div class="glow-orb orb-4"></div>
   </div>
-  <div class="bg-grid-overlay"></div>
-  <div id="cursor-glow" class="cursor-glow"></div>
+  <div class="bg-grid-overlay" aria-hidden="true"></div>
+  <div id="cursor-glow" class="cursor-glow" aria-hidden="true"></div>
 
   <!-- =========================================================================
        2. FULL-SCREEN WELCOME OVERLAY (PANTALLA DE BIENVENIDA CRISTAL)
@@ -35,7 +36,8 @@
   <section id="welcome-overlay" class="welcome-overlay" aria-modal="true" role="dialog">
     <div class="welcome-glass-card">
       <div class="welcome-badge">
-        <i class="fa-solid fa-sparkles"></i> PORTAFOLIO & REPOSITORIOS
+        <i class="fa-solid fa-sparkles"></i>
+        <span>PORTAFOLIO & REPOSITORIOS</span>
       </div>
       <h1 class="welcome-title">Bienvenidos/as a mis proyectos</h1>
       <p class="welcome-subtitle">
@@ -57,7 +59,7 @@
         </div>
       </div>
 
-      <button id="btn-welcome-continue" class="btn-welcome-continue" type="button">
+      <button id="btn-welcome-continue" class="btn-welcome-continue" type="button" aria-label="Entrar al portafolio">
         <span>Continuar</span>
         <i class="fa-solid fa-arrow-right"></i>
       </button>
@@ -73,7 +75,7 @@
     <header class="navbar">
       <nav class="navbar-glass">
         <!-- Brand / User Info -->
-        <a href="#hero" class="nav-brand">
+        <a href="#hero" class="nav-brand" aria-label="Ir al inicio">
           <div class="avatar-wrapper">
             <img 
               src="https://avatars.githubusercontent.com/u/93034871?v=4" 
@@ -89,26 +91,58 @@
           </div>
         </a>
 
-        <!-- Nav Links -->
+        <!-- Desktop Nav Links -->
         <ul class="nav-links">
-          <li><a href="#hero" class="nav-link active"><i class="fa-solid fa-house"></i> Inicio</a></li>
-          <li><a href="#projects" class="nav-link"><i class="fa-solid fa-layer-group"></i> Proyectos</a></li>
-          <li><a href="#contact" class="nav-link"><i class="fa-solid fa-paper-plane"></i> Formulario</a></li>
+          <li><a href="#hero" class="nav-link active"><i class="fa-solid fa-house"></i> <span>Inicio</span></a></li>
+          <li><a href="#projects" class="nav-link"><i class="fa-solid fa-layer-group"></i> <span>Proyectos</span></a></li>
+          <li><a href="#contact" class="nav-link"><i class="fa-solid fa-paper-plane"></i> <span>Formulario</span></a></li>
         </ul>
 
-        <!-- Nav Actions (Theme Toggle & GitHub) -->
+        <!-- Nav Actions (Theme Toggle, GitHub & Mobile Menu Toggle) -->
         <div class="nav-actions">
           <button id="theme-toggle-btn" class="btn-icon-glass" title="Alternar Modo Claro / Oscuro" aria-label="Cambiar tema">
             <i id="theme-icon" class="fa-solid fa-sun"></i>
           </button>
           
-          <a href="https://github.com/musicallyivan" target="_blank" rel="noopener noreferrer" class="btn-github-pill">
+          <a href="https://github.com/musicallyivan" target="_blank" rel="noopener noreferrer" class="btn-github-pill" aria-label="Visitar perfil de GitHub">
             <i class="fa-brands fa-github"></i>
-            <span>GitHub</span>
+            <span class="btn-text-desktop">GitHub</span>
           </a>
+
+          <!-- Mobile Hamburger Toggle -->
+          <button id="btn-mobile-menu" class="btn-mobile-menu" aria-label="Abrir menú de navegación" aria-expanded="false" aria-controls="mobile-menu-drawer">
+            <i class="fa-solid fa-bars"></i>
+          </button>
         </div>
       </nav>
     </header>
+
+    <!-- MOBILE MENU DRAWER OVERLAY -->
+    <div id="mobile-menu-drawer" class="mobile-drawer-overlay" aria-hidden="true">
+      <div class="mobile-drawer-card">
+        <div class="mobile-drawer-header">
+          <div class="brand-text">
+            <span class="brand-name">Ivan</span>
+            <span class="brand-tag">@musicallyivan</span>
+          </div>
+          <button id="btn-close-mobile-menu" class="btn-icon-glass" aria-label="Cerrar menú">
+            <i class="fa-solid fa-xmark"></i>
+          </button>
+        </div>
+
+        <ul class="mobile-drawer-links">
+          <li><a href="#hero" class="mobile-nav-item active"><i class="fa-solid fa-house"></i> <span>Inicio</span></a></li>
+          <li><a href="#projects" class="mobile-nav-item"><i class="fa-solid fa-layer-group"></i> <span>Proyectos</span></a></li>
+          <li><a href="#contact" class="mobile-nav-item"><i class="fa-solid fa-paper-plane"></i> <span>Formulario de Contacto</span></a></li>
+        </ul>
+
+        <div class="mobile-drawer-footer">
+          <a href="https://github.com/musicallyivan" target="_blank" rel="noopener noreferrer" class="btn-card-action btn-card-primary" style="width: 100%; padding: 0.9rem;">
+            <i class="fa-brands fa-github"></i> <span>Ver en GitHub</span>
+          </a>
+        </div>
+      </div>
+    </div>
 
     <!-- HERO HEADER SECTION -->
     <section id="hero" class="hero-section">
@@ -159,9 +193,10 @@
               class="search-input" 
               placeholder="Buscar por nombre, tecnología o descripción..." 
               autocomplete="off"
+              aria-label="Buscar proyectos"
             />
-            <i class="fa-solid fa-magnifying-glass search-icon"></i>
-            <button id="btn-clear-search" class="btn-clear-search" title="Limpiar búsqueda">
+            <i class="fa-solid fa-magnifying-glass search-icon" aria-hidden="true"></i>
+            <button id="btn-clear-search" class="btn-clear-search" title="Limpiar búsqueda" aria-label="Limpiar búsqueda">
               <i class="fa-solid fa-xmark"></i>
             </button>
           </div>
@@ -173,16 +208,18 @@
               <option value="stars">⭐ Más estrellas</option>
             </select>
 
-            <button id="btn-sync-github" class="btn-sync-github" title="Sincronizar repositorios en tiempo real">
+            <button id="btn-sync-github" class="btn-sync-github" title="Sincronizar repositorios en tiempo real" aria-label="Sincronizar con GitHub">
               <i class="fa-solid fa-arrows-rotate"></i>
               <span>Sincronizar</span>
             </button>
           </div>
         </div>
 
-        <!-- Language / Category Filter Chips -->
-        <div id="filter-chips-container" class="filter-chips-wrapper">
-          <!-- Populated dynamically by app.js -->
+        <!-- Language / Category Filter Chips (Responsive Scrollable Container) -->
+        <div class="filter-chips-scroll-container">
+          <div id="filter-chips-container" class="filter-chips-wrapper">
+            <!-- Populated dynamically by app.js -->
+          </div>
         </div>
       </div>
     </section>
@@ -280,17 +317,17 @@
       <div class="footer-glass">
         <div class="footer-brand">
           <div class="footer-brand-title">Ivan • musicallyivan</div>
-          <p class="footer-copy">© 2026 Diseñado con estilo Glassmorphism y animaciones modernas.</p>
+          <p class="footer-copy">© 2026 Diseñado con estilo Glassmorphism y animaciones modernas. Totalmente responsivo.</p>
         </div>
 
         <div class="footer-socials">
-          <a href="https://github.com/musicallyivan" target="_blank" rel="noopener noreferrer" class="social-btn" title="GitHub">
+          <a href="https://github.com/musicallyivan" target="_blank" rel="noopener noreferrer" class="social-btn" title="GitHub" aria-label="GitHub">
             <i class="fa-brands fa-github"></i>
           </a>
-          <a href="https://musicallyivan.github.io/mediaflow/" target="_blank" rel="noopener noreferrer" class="social-btn" title="MediaFlow">
+          <a href="https://musicallyivan.github.io/mediaflow/" target="_blank" rel="noopener noreferrer" class="social-btn" title="MediaFlow" aria-label="MediaFlow">
             <i class="fa-solid fa-film"></i>
           </a>
-          <a href="https://musicallyivan-web.vercel.app" target="_blank" rel="noopener noreferrer" class="social-btn" title="Web Oficial">
+          <a href="https://musicallyivan-web.vercel.app" target="_blank" rel="noopener noreferrer" class="social-btn" title="Web Oficial" aria-label="Web Oficial">
             <i class="fa-solid fa-globe"></i>
           </a>
         </div>

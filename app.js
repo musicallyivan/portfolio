@@ -1,6 +1,7 @@
 /**
  * Portfolio Glassmorphic 2.0 - Core Application
  * Developed with Vanilla Modern JavaScript
+ * Fully adapted for any type of device (Mobile, Tablet, Foldable, Desktop, 4K)
  */
 
 // ==========================================================================
@@ -276,8 +277,8 @@ function playChime(type = 'success') {
     
     if (type === 'welcome') {
       osc.type = 'sine';
-      osc.frequency.setValueAtTime(440, ctx.currentTime); // A4
-      osc.frequency.exponentialRampToValueAtTime(880, ctx.currentTime + 0.35); // A5
+      osc.frequency.setValueAtTime(440, ctx.currentTime);
+      osc.frequency.exponentialRampToValueAtTime(880, ctx.currentTime + 0.35);
       gain.gain.setValueAtTime(0.08, ctx.currentTime);
       gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.45);
       osc.start();
@@ -312,10 +313,11 @@ function initWelcomeScreen() {
     // Auto-scroll to top smoothly
     window.scrollTo({ top: 0, behavior: 'smooth' });
 
-    // Focus search input after entrance
+    // Focus search input after entrance if not on touch screen
     setTimeout(() => {
       const searchInput = document.getElementById('search-input');
-      if (searchInput && window.innerWidth > 768) {
+      const isTouch = window.matchMedia('(hover: none)').matches;
+      if (searchInput && !isTouch && window.innerWidth > 768) {
         searchInput.focus();
       }
     }, 850);
@@ -335,7 +337,58 @@ function initWelcomeScreen() {
 }
 
 // ==========================================================================
-// 5. THEME TOGGLE CONTROLLER
+// 5. MOBILE DRAWER MENU CONTROLLER
+// ==========================================================================
+function initMobileMenu() {
+  const btnMobileMenu = document.getElementById('btn-mobile-menu');
+  const btnCloseMobileMenu = document.getElementById('btn-close-mobile-menu');
+  const mobileDrawer = document.getElementById('mobile-menu-drawer');
+  const mobileNavLinks = document.querySelectorAll('.mobile-nav-item');
+
+  function openDrawer() {
+    playChime('click');
+    mobileDrawer?.classList.add('active');
+    mobileDrawer?.setAttribute('aria-hidden', 'false');
+    btnMobileMenu?.setAttribute('aria-expanded', 'true');
+    document.body.style.overflow = 'hidden';
+  }
+
+  function closeDrawer() {
+    mobileDrawer?.classList.remove('active');
+    mobileDrawer?.setAttribute('aria-hidden', 'true');
+    btnMobileMenu?.setAttribute('aria-expanded', 'false');
+    document.body.style.overflow = 'auto';
+  }
+
+  btnMobileMenu?.addEventListener('click', openDrawer);
+  btnCloseMobileMenu?.addEventListener('click', closeDrawer);
+
+  // Close when clicking outside of the drawer card
+  mobileDrawer?.addEventListener('click', (e) => {
+    if (e.target === mobileDrawer) {
+      closeDrawer();
+    }
+  });
+
+  // Close on nav link click
+  mobileNavLinks.forEach(link => {
+    link.addEventListener('click', () => {
+      mobileNavLinks.forEach(l => l.classList.remove('active'));
+      link.classList.add('active');
+      closeDrawer();
+    });
+  });
+
+  // Close on Escape key
+  window.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && mobileDrawer?.classList.contains('active')) {
+      closeDrawer();
+    }
+  });
+}
+
+// ==========================================================================
+// 6. THEME TOGGLE CONTROLLER
 // ==========================================================================
 function initTheme() {
   const themeToggleBtn = document.getElementById('theme-toggle-btn');
@@ -371,50 +424,55 @@ function initTheme() {
 }
 
 // ==========================================================================
-// 6. MOUSE GLOW & 3D TILT EFFECT
+// 7. MOUSE GLOW & 3D TILT EFFECT (DESKTOP ONLY)
 // ==========================================================================
 function initMouseEffects() {
   const cursorGlow = document.getElementById('cursor-glow');
 
-  window.addEventListener('mousemove', (e) => {
-    if (cursorGlow) {
-      cursorGlow.style.left = `${e.clientX}px`;
-      cursorGlow.style.top = `${e.clientY}px`;
-    }
-  });
+  // Check if device supports fine hover pointer (non-touch)
+  const isFinePointer = window.matchMedia('(hover: hover) and (pointer: fine)').matches;
 
-  // 3D Card Tilt on Mouse Move
-  document.addEventListener('mousemove', (e) => {
-    const cards = document.querySelectorAll('.repo-card');
-    cards.forEach(card => {
-      const rect = card.getBoundingClientRect();
-      const x = e.clientX - rect.left;
-      const y = e.clientY - rect.top;
-
-      if (
-        e.clientX >= rect.left &&
-        e.clientX <= rect.right &&
-        e.clientY >= rect.top &&
-        e.clientY <= rect.bottom
-      ) {
-        card.style.setProperty('--mouse-x', `${x}px`);
-        card.style.setProperty('--mouse-y', `${y}px`);
-
-        const centerX = rect.width / 2;
-        const centerY = rect.height / 2;
-        const rotateX = ((y - centerY) / centerY) * -7;
-        const rotateY = ((x - centerX) / centerX) * 7;
-
-        card.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) translateY(-8px)`;
-      } else {
-        card.style.transform = '';
+  if (isFinePointer) {
+    window.addEventListener('mousemove', (e) => {
+      if (cursorGlow) {
+        cursorGlow.style.left = `${e.clientX}px`;
+        cursorGlow.style.top = `${e.clientY}px`;
       }
     });
-  });
+
+    // 3D Card Tilt on Mouse Move
+    document.addEventListener('mousemove', (e) => {
+      const cards = document.querySelectorAll('.repo-card');
+      cards.forEach(card => {
+        const rect = card.getBoundingClientRect();
+        const x = e.clientX - rect.left;
+        const y = e.clientY - rect.top;
+
+        if (
+          e.clientX >= rect.left &&
+          e.clientX <= rect.right &&
+          e.clientY >= rect.top &&
+          e.clientY <= rect.bottom
+        ) {
+          card.style.setProperty('--mouse-x', `${x}px`);
+          card.style.setProperty('--mouse-y', `${y}px`);
+
+          const centerX = rect.width / 2;
+          const centerY = rect.height / 2;
+          const rotateX = ((y - centerY) / centerY) * -6;
+          const rotateY = ((x - centerX) / centerX) * 6;
+
+          card.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) translateY(-8px)`;
+        } else {
+          card.style.transform = '';
+        }
+      });
+    });
+  }
 }
 
 // ==========================================================================
-// 7. GITHUB REPOSITORIES FETCH & SYNC
+// 8. GITHUB REPOSITORIES FETCH & SYNC
 // ==========================================================================
 async function fetchGitHubRepos(forceNotify = false) {
   const syncBtn = document.getElementById('btn-sync-github');
@@ -488,7 +546,7 @@ function getLanguageIcon(lang) {
 }
 
 // ==========================================================================
-// 8. STATS COUNTER RENDERER
+// 9. STATS COUNTER RENDERER
 // ==========================================================================
 function updateStats() {
   const totalReposEl = document.getElementById('stat-total-repos');
@@ -514,7 +572,6 @@ function animateCounter(element, targetValue) {
   function update(currentTime) {
     const elapsed = currentTime - startTime;
     const progress = Math.min(elapsed / duration, 1);
-    // easeOutExpo
     const easeProgress = progress === 1 ? 1 : 1 - Math.pow(2, -10 * progress);
     const current = Math.floor(easeProgress * targetValue);
     element.textContent = current;
@@ -530,7 +587,7 @@ function animateCounter(element, targetValue) {
 }
 
 // ==========================================================================
-// 9. FILTER CHIPS RENDERER
+// 10. FILTER CHIPS RENDERER
 // ==========================================================================
 function renderFilterChips() {
   const container = document.getElementById('filter-chips-container');
@@ -565,6 +622,7 @@ function renderFilterChips() {
         class="filter-chip ${state.activeFilter === f.id ? 'active' : ''}" 
         data-filter="${f.id}"
         onclick="setFilter('${f.id}')"
+        aria-pressed="${state.activeFilter === f.id}"
       >
         <i class="${f.icon.startsWith('fa-brands') ? 'fa-brands' : 'fa-solid'} ${f.icon}"></i>
         <span>${f.label}</span>
@@ -581,7 +639,7 @@ window.setFilter = function(filterId) {
 };
 
 // ==========================================================================
-// 10. PROJECTS GRID RENDERER
+// 11. PROJECTS GRID RENDERER
 // ==========================================================================
 function renderProjects() {
   const grid = document.getElementById('projects-grid');
@@ -590,7 +648,6 @@ function renderProjects() {
 
   // Filter repos
   let filtered = state.repos.filter(repo => {
-    // Category / Language filter
     if (state.activeFilter === 'demos') {
       if (!repo.homepage) return false;
     } else if (state.activeFilter !== 'all') {
@@ -599,7 +656,6 @@ function renderProjects() {
       }
     }
 
-    // Search query filter
     if (state.searchQuery.trim() !== '') {
       const q = state.searchQuery.toLowerCase();
       const inName = (repo.title || repo.name).toLowerCase().includes(q);
@@ -622,7 +678,6 @@ function renderProjects() {
     } else if (state.sortBy === 'stars') {
       return (b.stars || 0) - (a.stars || 0);
     } else {
-      // Recent updated_at
       return new Date(b.updated_at) - new Date(a.updated_at);
     }
   });
@@ -638,7 +693,7 @@ function renderProjects() {
         <i class="fa-solid fa-compass-slash empty-icon"></i>
         <h3 class="empty-title">No se encontraron proyectos</h3>
         <p class="empty-desc">Intenta buscar con otros términos o limpia los filtros activos.</p>
-        <button class="btn-card-action btn-card-primary" style="max-width: 200px; margin: 0 auto;" onclick="resetSearchAndFilters()">
+        <button class="btn-card-action btn-card-primary" style="max-width: 220px; margin: 0 auto;" onclick="resetSearchAndFilters()">
           <i class="fa-solid fa-rotate-left"></i> Restablecer filtros
         </button>
       </div>
@@ -657,7 +712,7 @@ function renderProjects() {
     const isLive = Boolean(repo.homepage);
 
     return `
-      <article class="repo-card" style="animation: fadeInUp 0.5s ease backwards ${idx * 0.05}s">
+      <article class="repo-card" style="animation: fadeInUp 0.5s ease backwards ${idx * 0.04}s">
         <div class="card-shine"></div>
         
         <div>
@@ -714,7 +769,7 @@ function renderProjects() {
             <a href="${repo.html_url}" target="_blank" rel="noopener noreferrer" class="btn-card-action btn-card-secondary" title="Ver código en GitHub">
               <i class="fa-brands fa-github"></i> Código
             </a>
-            <button class="btn-card-copy" onclick="copyCloneUrl('${repo.html_url}')" title="Copiar comando git clone">
+            <button class="btn-card-copy" onclick="copyCloneUrl('${repo.html_url}')" title="Copiar comando git clone" aria-label="Copiar comando git clone">
               <i class="fa-regular fa-copy"></i>
             </button>
           </div>
@@ -736,7 +791,7 @@ window.resetSearchAndFilters = function() {
 };
 
 // ==========================================================================
-// 11. SEARCH & SORT CONTROLLERS
+// 12. SEARCH & SORT CONTROLLERS
 // ==========================================================================
 function initSearchAndControls() {
   const searchInput = document.getElementById('search-input');
@@ -786,7 +841,7 @@ function initSearchAndControls() {
 }
 
 // ==========================================================================
-// 12. GOOGLE FORM CONTROLLER
+// 13. GOOGLE FORM CONTROLLER
 // ==========================================================================
 function initGoogleForm() {
   const iframe = document.getElementById('google-form-iframe');
@@ -846,7 +901,7 @@ function initGoogleForm() {
 }
 
 // ==========================================================================
-// 13. TOAST & CLIPBOARD UTILITIES
+// 14. TOAST & CLIPBOARD UTILITIES
 // ==========================================================================
 window.copyCloneUrl = function(repoUrl) {
   playChime('click');
@@ -869,7 +924,6 @@ function showToast(message, icon = 'fa-info-circle') {
   container.innerHTML = '';
   container.appendChild(toast);
 
-  // Trigger animation
   requestAnimationFrame(() => {
     toast.classList.add('show');
   });
@@ -881,7 +935,7 @@ function showToast(message, icon = 'fa-info-circle') {
 }
 
 // ==========================================================================
-// 14. FLOATING TOP BUTTON & SMOOTH NAV
+// 15. FLOATING TOP BUTTON & SMOOTH NAV
 // ==========================================================================
 function initScrollAndNav() {
   const topBtn = document.getElementById('btn-scroll-top');
@@ -903,10 +957,11 @@ function initScrollAndNav() {
 }
 
 // ==========================================================================
-// 15. INITIALIZATION BOOTSTRAP
+// 16. INITIALIZATION BOOTSTRAP
 // ==========================================================================
 document.addEventListener('DOMContentLoaded', () => {
   initWelcomeScreen();
+  initMobileMenu();
   initTheme();
   initMouseEffects();
   initSearchAndControls();
