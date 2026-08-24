@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Portafolio & Proyectos | Ivan (musicallyivan)</title>
+  <meta name="description" content="Portafolio interactivo con estilo Glassmorphism de todos mis proyectos y repositorios de GitHub." />
+
+  <!-- Google Fonts & Font Awesome Icons -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Outfit:wght@300;400;500;600;700;800;900&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+
+  <!-- Stylesheet -->
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+  <!-- =========================================================================
+       1. AMBIENT BACKGROUND & MESH GLOW ORBS
+       ========================================================================= -->
+  <div class="ambient-background">
+    <div class="glow-orb orb-1"></div>
+    <div class="glow-orb orb-2"></div>
+    <div class="glow-orb orb-3"></div>
+    <div class="glow-orb orb-4"></div>
+  </div>
+  <div class="bg-grid-overlay"></div>
+  <div id="cursor-glow" class="cursor-glow"></div>
+
+  <!-- =========================================================================
+       2. FULL-SCREEN WELCOME OVERLAY (PANTALLA DE BIENVENIDA CRISTAL)
+       ========================================================================= -->
+  <section id="welcome-overlay" class="welcome-overlay" aria-modal="true" role="dialog">
+    <div class="welcome-glass-card">
+      <div class="welcome-badge">
+        <i class="fa-solid fa-sparkles"></i> PORTAFOLIO & REPOSITORIOS
+      </div>
+      <h1 class="welcome-title">Bienvenidos/as a mis proyectos</h1>
+      <p class="welcome-subtitle">
+        Sumérgete en mi colección de software, aplicaciones interactivas, herramientas de automatización y proyectos de código abierto.
+      </p>
+      
+      <div class="welcome-highlights">
+        <div class="welcome-pill">
+          <i class="fa-solid fa-wand-magic-sparkles"></i>
+          <span>Glassmorphism 2.0</span>
+        </div>
+        <div class="welcome-pill">
+          <i class="fa-solid fa-bolt"></i>
+          <span>Demos en Vivo</span>
+        </div>
+        <div class="welcome-pill">
+          <i class="fa-brands fa-github"></i>
+          <span>100% Código Abierto</span>
+        </div>
+      </div>
+
+      <button id="btn-welcome-continue" class="btn-welcome-continue" type="button">
+        <span>Continuar</span>
+        <i class="fa-solid fa-arrow-right"></i>
+      </button>
+    </div>
+  </section>
+
+  <!-- =========================================================================
+       3. MAIN PORTFOLIO APPLICATION
+       ========================================================================= -->
+  <div class="app-container">
+
+    <!-- NAVBAR (FLOATING GLASS ISLAND) -->
+    <header class="navbar">
+      <nav class="navbar-glass">
+        <!-- Brand / User Info -->
+        <a href="#hero" class="nav-brand">
+          <div class="avatar-wrapper">
+            <img 
+              src="https://avatars.githubusercontent.com/u/93034871?v=4" 
+              alt="Avatar de Ivan" 
+              class="nav-avatar" 
+              onerror="this.src='https://github.githubassets.com/images/modules/logos_page/GitHub-Mark.png'"
+            />
+            <span class="status-dot" title="Disponible para colaborar"></span>
+          </div>
+          <div class="brand-text">
+            <span class="brand-name">Ivan</span>
+            <span class="brand-tag">@musicallyivan</span>
+          </div>
+        </a>
+
+        <!-- Nav Links -->
+        <ul class="nav-links">
+          <li><a href="#hero" class="nav-link active"><i class="fa-solid fa-house"></i> Inicio</a></li>
+          <li><a href="#projects" class="nav-link"><i class="fa-solid fa-layer-group"></i> Proyectos</a></li>
+          <li><a href="#contact" class="nav-link"><i class="fa-solid fa-paper-plane"></i> Formulario</a></li>
+        </ul>
+
+        <!-- Nav Actions (Theme Toggle & GitHub) -->
+        <div class="nav-actions">
+          <button id="theme-toggle-btn" class="btn-icon-glass" title="Alternar Modo Claro / Oscuro" aria-label="Cambiar tema">
+            <i id="theme-icon" class="fa-solid fa-sun"></i>
+          </button>
+          
+          <a href="https://github.com/musicallyivan" target="_blank" rel="noopener noreferrer" class="btn-github-pill">
+            <i class="fa-brands fa-github"></i>
+            <span>GitHub</span>
+          </a>
+        </div>
+      </nav>
+    </header>
+
+    <!-- HERO HEADER SECTION -->
+    <section id="hero" class="hero-section">
+      <div class="hero-main-card">
+        <div class="hero-badge-tag">
+          <i class="fa-solid fa-code"></i> DESARROLLADOR FULLSTACK & SOFTWARE
+        </div>
+        
+        <h1 class="hero-title">
+          Mis Creaciones & <span class="gradient-text">Repositorios</span>
+        </h1>
+        
+        <p class="hero-desc">
+          Explora mis aplicaciones interactivas, convertidores multimedia, rastreadores temáticos, bibliotecas y herramientas de código abierto organizadas con diseño moderno y soporte para demos en vivo.
+        </p>
+
+        <!-- Stats Counter Row -->
+        <div class="stats-grid">
+          <div class="stat-card">
+            <div id="stat-total-repos" class="stat-number">0</div>
+            <div class="stat-label">Repositorios</div>
+          </div>
+          <div class="stat-card">
+            <div id="stat-total-languages" class="stat-number">0</div>
+            <div class="stat-label">Tecnologías</div>
+          </div>
+          <div class="stat-card">
+            <div id="stat-total-demos" class="stat-number">0</div>
+            <div class="stat-label">Demos en Línea</div>
+          </div>
+          <div class="stat-card">
+            <div id="stat-total-stars" class="stat-number">0</div>
+            <div class="stat-label">Estrellas GitHub</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- CONTROLS & FILTERS SECTION -->
+    <section class="controls-section">
+      <div class="controls-glass">
+        <!-- Search, Sort & GitHub Sync -->
+        <div class="search-and-sync-row">
+          <div class="search-box-wrapper">
+            <input 
+              type="text" 
+              id="search-input" 
+              class="search-input" 
+              placeholder="Buscar por nombre, tecnología o descripción..." 
+              autocomplete="off"
+            />
+            <i class="fa-solid fa-magnifying-glass search-icon"></i>
+            <button id="btn-clear-search" class="btn-clear-search" title="Limpiar búsqueda">
+              <i class="fa-solid fa-xmark"></i>
+            </button>
+          </div>
+
+          <div class="controls-aux">
+            <select id="sort-select" class="custom-select" aria-label="Ordenar repositorios">
+              <option value="recent">🕒 Más recientes</option>
+              <option value="name">🔤 Nombre (A - Z)</option>
+              <option value="stars">⭐ Más estrellas</option>
+            </select>
+
+            <button id="btn-sync-github" class="btn-sync-github" title="Sincronizar repositorios en tiempo real">
+              <i class="fa-solid fa-arrows-rotate"></i>
+              <span>Sincronizar</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Language / Category Filter Chips -->
+        <div id="filter-chips-container" class="filter-chips-wrapper">
+          <!-- Populated dynamically by app.js -->
+        </div>
+      </div>
+    </section>
+
+    <!-- PROJECTS GRID SECTION -->
+    <main id="projects" class="projects-section">
+      <div class="section-header">
+        <div class="section-title-wrap">
+          <span class="section-badge"><i class="fa-solid fa-grid-2"></i> CATÁLOGO COMPLETO</span>
+          <h2 class="section-title">Galería de Repositorios</h2>
+        </div>
+        <div id="filtered-count" class="results-info">Cargando proyectos...</div>
+      </div>
+
+      <!-- Grid Container -->
+      <div id="projects-grid" class="projects-grid">
+        <!-- Repositories rendered dynamically by app.js -->
+      </div>
+    </main>
+
+    <!-- GOOGLE FORM EMBED & CONTACT SECTION -->
+    <section id="contact" class="contact-section">
+      <div class="contact-glass-card">
+        <div class="contact-header">
+          <div class="hero-badge-tag">
+            <i class="fa-solid fa-envelope"></i> CONTACTO & FEEDBACK
+          </div>
+          <h2 class="contact-title">¿Tienes un proyecto en mente?</h2>
+          <p class="contact-desc">
+            Envíame tus dudas, propuestas de colaboración o sugerencias a través del siguiente formulario interactivo de Google Forms.
+          </p>
+        </div>
+
+        <!-- Form Action Bar -->
+        <div class="form-config-bar">
+          <div class="form-status">
+            <i class="fa-solid fa-file-lines"></i>
+            <span>Formulario de Google Integrado</span>
+          </div>
+
+          <div class="form-actions-row">
+            <button id="btn-toggle-form-config" class="btn-form-action" title="Personalizar enlace del formulario de Google">
+              <i class="fa-solid fa-gear"></i>
+              <span>Cambiar Formulario</span>
+            </button>
+
+            <button id="btn-open-form-tab" class="btn-form-action" title="Abrir formulario en nueva pestaña">
+              <i class="fa-solid fa-arrow-up-right-from-square"></i>
+              <span>Abrir pestaña</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Hidden Form URL Configurator Panel -->
+        <div id="form-config-panel" class="form-url-input-container">
+          <label for="form-url-input" style="font-size: 0.88rem; font-weight: 600; color: var(--text-secondary);">
+            Pega aquí la URL incrustada de tu Google Form (iframe/viewform):
+          </label>
+          <div class="input-group-row">
+            <input 
+              type="url" 
+              id="form-url-input" 
+              class="url-input" 
+              placeholder="https://docs.google.com/forms/d/e/.../viewform?embedded=true" 
+            />
+            <button id="btn-save-form-url" class="btn-save-url" type="button">
+              <i class="fa-solid fa-floppy-disk"></i> Guardar
+            </button>
+            <button id="btn-reset-form-url" class="btn-form-action" type="button" style="background: rgba(239, 68, 68, 0.15); border-color: rgba(239, 68, 68, 0.3); color: #f87171;">
+              <i class="fa-solid fa-rotate-left"></i> Restablecer
+            </button>
+          </div>
+        </div>
+
+        <!-- Google Form Embed Iframe Container -->
+        <div class="form-embed-wrapper">
+          <iframe 
+            id="google-form-iframe"
+            class="form-iframe"
+            src=""
+            frameborder="0"
+            marginheight="0"
+            marginwidth="0"
+            title="Formulario de contacto de Google"
+            loading="lazy"
+          >
+            Cargando formulario…
+          </iframe>
+        </div>
+      </div>
+    </section>
+
+    <!-- FOOTER -->
+    <footer class="footer">
+      <div class="footer-glass">
+        <div class="footer-brand">
+          <div class="footer-brand-title">Ivan • musicallyivan</div>
+          <p class="footer-copy">© 2026 Diseñado con estilo Glassmorphism y animaciones modernas.</p>
+        </div>
+
+        <div class="footer-socials">
+          <a href="https://github.com/musicallyivan" target="_blank" rel="noopener noreferrer" class="social-btn" title="GitHub">
+            <i class="fa-brands fa-github"></i>
+          </a>
+          <a href="https://musicallyivan.github.io/mediaflow/" target="_blank" rel="noopener noreferrer" class="social-btn" title="MediaFlow">
+            <i class="fa-solid fa-film"></i>
+          </a>
+          <a href="https://musicallyivan-web.vercel.app" target="_blank" rel="noopener noreferrer" class="social-btn" title="Web Oficial">
+            <i class="fa-solid fa-globe"></i>
+          </a>
+        </div>
+      </div>
+    </footer>
+
+  </div>
+
+  <!-- FLOATING SCROLL TOP BUTTON -->
+  <button id="btn-scroll-top" class="btn-floating-top" title="Volver arriba" aria-label="Volver arriba">
+    <i class="fa-solid fa-chevron-up"></i>
+  </button>
+
+  <!-- TOAST NOTIFICATIONS CONTAINER -->
+  <div id="toast-container" class="toast-container" aria-live="polite"></div>
+
+  <!-- Application Script -->
+  <script src="app.js"></script>
+</body>
+</html>
