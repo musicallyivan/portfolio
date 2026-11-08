@@ -253,62 +253,21 @@
           </p>
         </div>
 
-        <!-- Form Action Bar -->
-        <div class="form-config-bar">
-          <div class="form-status">
-            <i class="fa-solid fa-file-lines"></i>
-            <span>Formulario de Google Integrado</span>
-          </div>
-
-          <div class="form-actions-row">
-            <button id="btn-toggle-form-config" class="btn-form-action" title="Personalizar enlace del formulario de Google">
-              <i class="fa-solid fa-gear"></i>
-              <span>Cambiar Formulario</span>
-            </button>
-
-            <button id="btn-open-form-tab" class="btn-form-action" title="Abrir formulario en nueva pestaña">
-              <i class="fa-solid fa-arrow-up-right-from-square"></i>
-              <span>Abrir pestaña</span>
-            </button>
-          </div>
-        </div>
-
-        <!-- Hidden Form URL Configurator Panel -->
-        <div id="form-config-panel" class="form-url-input-container">
-          <label for="form-url-input" style="font-size: 0.88rem; font-weight: 600; color: var(--text-secondary);">
-            Pega aquí la URL incrustada de tu Google Form (iframe/viewform):
-          </label>
-          <div class="input-group-row">
-            <input 
-              type="url" 
-              id="form-url-input" 
-              class="url-input" 
-              placeholder="https://docs.google.com/forms/d/e/.../viewform?embedded=true" 
-            />
-            <button id="btn-save-form-url" class="btn-save-url" type="button">
-              <i class="fa-solid fa-floppy-disk"></i> Guardar
-            </button>
-            <button id="btn-reset-form-url" class="btn-form-action" type="button" style="background: rgba(239, 68, 68, 0.15); border-color: rgba(239, 68, 68, 0.3); color: #f87171;">
-              <i class="fa-solid fa-rotate-left"></i> Restablecer
-            </button>
-          </div>
-        </div>
-
         <!-- Google Form Embed Iframe Container -->
         <div class="form-embed-wrapper">
-          <iframe 
+          <iframe
             id="google-form-iframe"
             class="form-iframe"
-            src=""
-            frameborder="0"
-            marginheight="0"
-            marginwidth="0"
-            title="Formulario de contacto de Google"
+            src="https://docs.google.com/forms/d/e/1FAIpQLSfbEAZamu1cThf0AtbwNP9W-S1jnlK6qULG6VwN3nPm2Ln3NA/viewform?embedded=true"
+            title="Formulario de contacto de Ivan"
             loading="lazy"
-          >
-            Cargando formulario…
-          </iframe>
+            referrerpolicy="strict-origin-when-cross-origin"
+          ></iframe>
         </div>
+        <a class="form-open-link" href="https://docs.google.com/forms/d/e/1FAIpQLSfbEAZamu1cThf0AtbwNP9W-S1jnlK6qULG6VwN3nPm2Ln3NA/viewform" target="_blank" rel="noopener noreferrer">
+          <i class="fa-solid fa-arrow-up-right-from-square" aria-hidden="true"></i>
+          Abrir formulario en otra pestaña
+        </a>
       </div>
     </section>
 

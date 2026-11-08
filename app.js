@@ -257,8 +257,7 @@ const state = {
   activeFilter: 'all',
   searchQuery: '',
   sortBy: 'recent',
-  theme: localStorage.getItem('theme') || 'dark',
-  formUrl: localStorage.getItem('custom_google_form_url') || 'https://docs.google.com/forms/d/e/1FAIpQLScT8f3j4hY6W_9Vv5_PLACEHOLDER_FORM/viewform?embedded=true'
+  theme: localStorage.getItem('theme') || 'dark'
 };
 
 // ==========================================================================
@@ -841,67 +840,7 @@ function initSearchAndControls() {
 }
 
 // ==========================================================================
-// 13. GOOGLE FORM CONTROLLER
-// ==========================================================================
-function initGoogleForm() {
-  const iframe = document.getElementById('google-form-iframe');
-  const configPanel = document.getElementById('form-config-panel');
-  const toggleConfigBtn = document.getElementById('btn-toggle-form-config');
-  const saveUrlBtn = document.getElementById('btn-save-form-url');
-  const resetUrlBtn = document.getElementById('btn-reset-form-url');
-  const openTabBtn = document.getElementById('btn-open-form-tab');
-  const urlInput = document.getElementById('form-url-input');
-
-  function updateIframeSrc(url) {
-    if (iframe) {
-      iframe.src = url;
-    }
-  }
-
-  // Initial load
-  updateIframeSrc(state.formUrl);
-  if (urlInput) urlInput.value = state.formUrl;
-
-  if (toggleConfigBtn && configPanel) {
-    toggleConfigBtn.addEventListener('click', () => {
-      configPanel.classList.toggle('active');
-    });
-  }
-
-  if (saveUrlBtn && urlInput) {
-    saveUrlBtn.addEventListener('click', () => {
-      const val = urlInput.value.trim();
-      if (val) {
-        state.formUrl = val;
-        localStorage.setItem('custom_google_form_url', val);
-        updateIframeSrc(val);
-        configPanel.classList.remove('active');
-        showToast('Enlace del Formulario de Google actualizado', 'fa-check-circle');
-      }
-    });
-  }
-
-  if (resetUrlBtn && urlInput) {
-    resetUrlBtn.addEventListener('click', () => {
-      const defaultUrl = 'https://docs.google.com/forms/d/e/1FAIpQLScT8f3j4hY6W_9Vv5_PLACEHOLDER_FORM/viewform?embedded=true';
-      state.formUrl = defaultUrl;
-      localStorage.removeItem('custom_google_form_url');
-      urlInput.value = defaultUrl;
-      updateIframeSrc(defaultUrl);
-      configPanel.classList.remove('active');
-      showToast('Formulario restablecido al predeterminado', 'fa-rotate-left');
-    });
-  }
-
-  if (openTabBtn) {
-    openTabBtn.addEventListener('click', () => {
-      window.open(state.formUrl, '_blank');
-    });
-  }
-}
-
-// ==========================================================================
-// 14. TOAST & CLIPBOARD UTILITIES
+// 13. TOAST & CLIPBOARD UTILITIES
 // ==========================================================================
 window.copyCloneUrl = function(repoUrl) {
   playChime('click');
@@ -965,7 +904,6 @@ document.addEventListener('DOMContentLoaded', () => {
   initTheme();
   initMouseEffects();
   initSearchAndControls();
-  initGoogleForm();
   initScrollAndNav();
 
   // Initial render with curated database
