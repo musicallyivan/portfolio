@@ -716,6 +716,7 @@ function renderProjects() {
         </button>
       </div>
     `;
+    grid.querySelector('#btn-reset-search-filters')?.addEventListener('click', resetSearchAndFilters);
     return;
   }
 
