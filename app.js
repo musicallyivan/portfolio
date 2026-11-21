@@ -234,19 +234,19 @@ const CURATED_REPOS = [
   }
 ];
 
-// Color mapping for languages
-const LANGUAGE_COLORS = {
-  'JavaScript': '#f7df1e',
-  'TypeScript': '#3178c6',
-  'Python': '#3572A5',
-  'Swift': '#F05138',
-  'C#': '#178600',
-  'Astro': '#ff5a03',
-  'HTML': '#e34c26',
-  'CSS': '#563d7c',
-  'JSON': '#a855f7',
-  'Markdown': '#0891b2',
-  'Default': '#6366f1'
+// Map supported language labels to fixed CSS classes (no inline styles).
+const LANGUAGE_CLASSES = {
+  'JavaScript': 'lang-dot-javascript',
+  'TypeScript': 'lang-dot-typescript',
+  'Python': 'lang-dot-python',
+  'Swift': 'lang-dot-swift',
+  'C#': 'lang-dot-csharp',
+  'Astro': 'lang-dot-astro',
+  'HTML': 'lang-dot-html',
+  'CSS': 'lang-dot-css',
+  'JSON': 'lang-dot-json',
+  'Markdown': 'lang-dot-markdown',
+  'Default': 'lang-dot-default'
 };
 
 // ==========================================================================
