@@ -326,7 +326,6 @@ function initWelcomeScreen() {
   function dismissWelcome() {
     playChime('welcome');
     welcomeOverlay.classList.add('hidden');
-    document.body.style.overflow = 'auto';
 
     // Auto-scroll to top smoothly
     window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -368,14 +367,14 @@ function initMobileMenu() {
     mobileDrawer?.classList.add('active');
     mobileDrawer?.setAttribute('aria-hidden', 'false');
     btnMobileMenu?.setAttribute('aria-expanded', 'true');
-    document.body.style.overflow = 'hidden';
+    document.body.classList.add('mobile-drawer-open');
   }
 
   function closeDrawer() {
     mobileDrawer?.classList.remove('active');
     mobileDrawer?.setAttribute('aria-hidden', 'true');
     btnMobileMenu?.setAttribute('aria-expanded', 'false');
-    document.body.style.overflow = 'auto';
+    document.body.classList.remove('mobile-drawer-open');
   }
 
   btnMobileMenu?.addEventListener('click', openDrawer);
@@ -443,53 +442,6 @@ function initTheme() {
 
 // ==========================================================================
 // 7. MOUSE GLOW & 3D TILT EFFECT (DESKTOP ONLY)
-// ==========================================================================
-function initMouseEffects() {
-  const cursorGlow = document.getElementById('cursor-glow');
-
-  // Check if device supports fine hover pointer (non-touch)
-  const isFinePointer = window.matchMedia('(hover: hover) and (pointer: fine)').matches;
-
-  if (isFinePointer) {
-    window.addEventListener('mousemove', (e) => {
-      if (cursorGlow) {
-        cursorGlow.style.left = `${e.clientX}px`;
-        cursorGlow.style.top = `${e.clientY}px`;
-      }
-    });
-
-    // 3D Card Tilt on Mouse Move
-    document.addEventListener('mousemove', (e) => {
-      const cards = document.querySelectorAll('.repo-card');
-      cards.forEach(card => {
-        const rect = card.getBoundingClientRect();
-        const x = e.clientX - rect.left;
-        const y = e.clientY - rect.top;
-
-        if (
-          e.clientX >= rect.left &&
-          e.clientX <= rect.right &&
-          e.clientY >= rect.top &&
-          e.clientY <= rect.bottom
-        ) {
-          card.style.setProperty('--mouse-x', `${x}px`);
-          card.style.setProperty('--mouse-y', `${y}px`);
-
-          const centerX = rect.width / 2;
-          const centerY = rect.height / 2;
-          const rotateX = ((y - centerY) / centerY) * -6;
-          const rotateY = ((x - centerX) / centerX) * 6;
-
-          card.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) translateY(-8px)`;
-        } else {
-          card.style.transform = '';
-        }
-      });
-    });
-  }
-}
-
-// ==========================================================================
 // 8. GITHUB REPOSITORIES FETCH & SYNC
 // ==========================================================================
 async function fetchGitHubRepos(forceNotify = false) {
@@ -950,7 +902,6 @@ document.addEventListener('DOMContentLoaded', () => {
   initWelcomeScreen();
   initMobileMenu();
   initTheme();
-  initMouseEffects();
   initSearchAndControls();
   initScrollAndNav();
 
