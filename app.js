@@ -711,7 +711,7 @@ function renderProjects() {
         <i class="fa-solid fa-compass-slash empty-icon"></i>
         <h3 class="empty-title">No se encontraron proyectos</h3>
         <p class="empty-desc">Intenta buscar con otros términos o limpia los filtros activos.</p>
-        <button id="btn-reset-search-filters" type="button" class="btn-card-action btn-card-primary" style="max-width: 220px; margin: 0 auto;">
+        <button id="btn-reset-search-filters" type="button" class="btn-card-action btn-card-primary empty-reset-button">
           <i class="fa-solid fa-rotate-left" aria-hidden="true"></i> Restablecer filtros
         </button>
       </div>
@@ -720,7 +720,7 @@ function renderProjects() {
     return;
   }
 
-  grid.innerHTML = filtered.map((repo, idx) => {
+  grid.innerHTML = filtered.map((repo) => {
     const repoUrl = safeExternalUrl(repo.html_url, { githubOnly: true });
     const demoUrl = safeExternalUrl(repo.homepage);
     const title = escapeHTML(repo.title || repo.name);
@@ -730,7 +730,7 @@ function renderProjects() {
     const topics = (Array.isArray(repo.topics) ? repo.topics : [])
       .filter(topic => typeof topic === 'string')
       .slice(0, 3);
-    const langColor = LANGUAGE_COLORS[repo.language] || LANGUAGE_COLORS['Default'];
+    const langClass = LANGUAGE_CLASSES[repo.language] || LANGUAGE_CLASSES['Default'];
     const formattedDate = new Date(repo.updated_at).toLocaleDateString('es-ES', {
       year: 'numeric',
       month: 'short',
@@ -740,7 +740,7 @@ function renderProjects() {
     const isLive = Boolean(demoUrl);
 
     return `
-      <article class="repo-card" style="animation: fadeInUp 0.5s ease backwards ${idx * 0.04}s">
+      <article class="repo-card">
         <div class="card-shine"></div>
         
         <div>
@@ -764,7 +764,7 @@ function renderProjects() {
           <!-- Tags & Language -->
           <div class="card-tags">
             <span class="tag-lang">
-              <span class="lang-dot" style="background-color: ${langColor};"></span>
+              <span class="lang-dot ${langClass}"></span>
               ${language}
             </span>
             ${topics.map(topic => `<span class="tag-topic">#${escapeHTML(topic)}</span>`).join('')}
