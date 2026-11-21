@@ -1,4 +1,3 @@
-@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap');
 
 /* ==========================================================================
    CSS VARIABLES & THEME SYSTEM
@@ -221,25 +220,6 @@ button, input, select, textarea {
   }
   100% {
     transform: translate(-40px, 70px) scale(0.95) rotate(360deg);
-  }
-}
-
-/* Interactive Cursor Glow (Only on desktop) */
-.cursor-glow {
-  position: fixed;
-  width: 450px;
-  height: 450px;
-  border-radius: 50%;
-  background: radial-gradient(circle, rgba(99, 102, 241, 0.12) 0%, rgba(99, 102, 241, 0) 70%);
-  pointer-events: none;
-  transform: translate(-50%, -50%);
-  z-index: 1;
-  transition: opacity 0.3s ease;
-}
-
-@media (hover: none) {
-  .cursor-glow {
-    display: none;
   }
 }
 
@@ -2040,4 +2020,10 @@ body.light-theme .form-embed-wrapper { background: rgba(238, 242, 250, .75); }
   .repo-card {
     animation: none;
   }
+}
+
+
+/* Lock page scrolling while the mobile navigation drawer is open. */
+body.mobile-drawer-open {
+  overflow: hidden;
 }
