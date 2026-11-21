@@ -250,6 +250,25 @@ const LANGUAGE_COLORS = {
 };
 
 // ==========================================================================
+// Treat all repository metadata returned by GitHub as untrusted input.
+function escapeHTML(value) {
+  return String(value ?? '').replace(/[&<>"']/g, (char) => ({
+    '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+  })[char]);
+}
+
+function safeExternalUrl(value, { githubOnly = false } = {}) {
+  if (typeof value !== 'string' || !value.trim()) return null;
+  try {
+    const url = new URL(value);
+    if (!['https:', 'http:'].includes(url.protocol) || url.username || url.password) return null;
+    if (githubOnly && url.hostname.toLowerCase() !== 'github.com') return null;
+    return url.href;
+  } catch {
+    return null;
+  }
+}
+
 // 2. STATE MANAGEMENT
 // ==========================================================================
 const state = {
@@ -617,17 +636,17 @@ function renderFilterChips() {
   container.innerHTML = mainFilters
     .filter(f => f.count > 0 || f.id === 'all')
     .map(f => `
-      <button 
-        class="filter-chip ${state.activeFilter === f.id ? 'active' : ''}" 
-        data-filter="${f.id}"
-        onclick="setFilter('${f.id}')"
-        aria-pressed="${state.activeFilter === f.id}"
-      >
-        <i class="${f.icon.startsWith('fa-brands') ? 'fa-brands' : 'fa-solid'} ${f.icon}"></i>
-        <span>${f.label}</span>
+      <button type="button" class="filter-chip ${state.activeFilter === f.id ? 'active' : ''}"
+        data-filter="${escapeHTML(f.id)}" aria-pressed="${state.activeFilter === f.id}">
+        <i class="${f.icon.startsWith('fa-brands') ? 'fa-brands' : 'fa-solid'} ${escapeHTML(f.icon)}" aria-hidden="true"></i>
+        <span>${escapeHTML(f.label)}</span>
         <span class="chip-count">${f.count}</span>
       </button>
     `).join('');
+
+  container.querySelectorAll('[data-filter]').forEach((button) => {
+    button.addEventListener('click', () => setFilter(button.dataset.filter));
+  });
 }
 
 window.setFilter = function(filterId) {
@@ -692,15 +711,25 @@ function renderProjects() {
         <i class="fa-solid fa-compass-slash empty-icon"></i>
         <h3 class="empty-title">No se encontraron proyectos</h3>
         <p class="empty-desc">Intenta buscar con otros términos o limpia los filtros activos.</p>
-        <button class="btn-card-action btn-card-primary" style="max-width: 220px; margin: 0 auto;" onclick="resetSearchAndFilters()">
-          <i class="fa-solid fa-rotate-left"></i> Restablecer filtros
+        <button id="btn-reset-search-filters" type="button" class="btn-card-action btn-card-primary" style="max-width: 220px; margin: 0 auto;">
+          <i class="fa-solid fa-rotate-left" aria-hidden="true"></i> Restablecer filtros
         </button>
       </div>
     `;
+    grid.querySelector('#btn-reset-search-filters')?.addEventListener('click', resetSearchAndFilters);
     return;
   }
 
   grid.innerHTML = filtered.map((repo, idx) => {
+    const repoUrl = safeExternalUrl(repo.html_url, { githubOnly: true });
+    const demoUrl = safeExternalUrl(repo.homepage);
+    const title = escapeHTML(repo.title || repo.name);
+    const description = escapeHTML(repo.description || '');
+    const language = escapeHTML(repo.language || 'Código');
+    const icon = escapeHTML(repo.icon || 'fa-solid fa-code-branch');
+    const topics = (Array.isArray(repo.topics) ? repo.topics : [])
+      .filter(topic => typeof topic === 'string')
+      .slice(0, 3);
     const langColor = LANGUAGE_COLORS[repo.language] || LANGUAGE_COLORS['Default'];
     const formattedDate = new Date(repo.updated_at).toLocaleDateString('es-ES', {
       year: 'numeric',
@@ -708,7 +737,7 @@ function renderProjects() {
       day: 'numeric'
     });
 
-    const isLive = Boolean(repo.homepage);
+    const isLive = Boolean(demoUrl);
 
     return `
       <article class="repo-card" style="animation: fadeInUp 0.5s ease backwards ${idx * 0.04}s">
@@ -718,7 +747,7 @@ function renderProjects() {
           <!-- Card Top Bar -->
           <div class="card-top-bar">
             <div class="card-icon-container">
-              <i class="${repo.icon}"></i>
+              <i class="${icon}" aria-hidden="true"></i>
             </div>
             <div class="card-badges">
               ${isLive ? `<span class="badge-live-demo"><i class="fa-solid fa-bolt"></i> Demo Online</span>` : ''}
@@ -728,17 +757,17 @@ function renderProjects() {
 
           <!-- Card Body -->
           <div class="card-body">
-            <h3 class="repo-name">${repo.title || repo.name}</h3>
-            <p class="repo-desc">${repo.description}</p>
+            <h3 class="repo-name">${title}</h3>
+            <p class="repo-desc">${description}</p>
           </div>
 
           <!-- Tags & Language -->
           <div class="card-tags">
             <span class="tag-lang">
               <span class="lang-dot" style="background-color: ${langColor};"></span>
-              ${repo.language || 'Código'}
+              ${language}
             </span>
-            ${(repo.topics || []).slice(0, 3).map(t => `<span class="tag-topic">#${t}</span>`).join('')}
+            ${topics.map(topic => `<span class="tag-topic">#${escapeHTML(topic)}</span>`).join('')}
           </div>
         </div>
 
@@ -761,14 +790,14 @@ function renderProjects() {
           <!-- Card Actions -->
           <div class="card-actions">
             ${isLive ? `
-              <a href="${repo.homepage}" target="_blank" rel="noopener noreferrer" class="btn-card-action btn-card-primary" title="Abrir demo en vivo">
+              <a href="${escapeHTML(demoUrl)}" target="_blank" rel="noopener noreferrer" class="btn-card-action btn-card-primary" title="Abrir demo en vivo">
                 <i class="fa-solid fa-arrow-up-right-from-square"></i> Demo
               </a>
             ` : ''}
-            <a href="${repo.html_url}" target="_blank" rel="noopener noreferrer" class="btn-card-action btn-card-secondary" title="Ver código en GitHub">
+            <a href="${escapeHTML(repoUrl || 'https://github.com')}" target="_blank" rel="noopener noreferrer" class="btn-card-action btn-card-secondary" title="Ver código en GitHub" ${repoUrl ? '' : 'aria-disabled="true"'}>
               <i class="fa-brands fa-github"></i> Código
             </a>
-            <button class="btn-card-copy" onclick="copyCloneUrl('${repo.html_url}')" title="Copiar comando git clone" aria-label="Copiar comando git clone">
+            <button class="btn-card-copy" type="button" data-clone-url="${escapeHTML(repoUrl || '')}" title="Copiar comando git clone" aria-label="Copiar comando git clone" ${repoUrl ? '' : 'disabled'}>
               <i class="fa-regular fa-copy"></i>
             </button>
           </div>
@@ -776,6 +805,11 @@ function renderProjects() {
       </article>
     `;
   }).join('');
+
+  grid.querySelectorAll('[data-clone-url]').forEach((button) => {
+    button.addEventListener('click', () => copyCloneUrl(button.dataset.cloneUrl));
+  });
+  grid.querySelector('#btn-reset-search-filters')?.addEventListener('click', resetSearchAndFilters);
 }
 
 window.resetSearchAndFilters = function() {
@@ -844,9 +878,18 @@ function initSearchAndControls() {
 // ==========================================================================
 window.copyCloneUrl = function(repoUrl) {
   playChime('click');
-  const cloneCmd = `git clone ${repoUrl}.git`;
+  const validatedUrl = safeExternalUrl(repoUrl, { githubOnly: true });
+  if (!validatedUrl) {
+    showToast('URL de repositorio no válida', 'fa-circle-xmark');
+    return;
+  }
+  const cloneCmd = `git clone ${validatedUrl}.git`;
+  if (!navigator.clipboard?.writeText) {
+    showToast('El portapapeles no está disponible en este navegador', 'fa-circle-xmark');
+    return;
+  }
   navigator.clipboard.writeText(cloneCmd).then(() => {
-    showToast(`Comando copiado: ${cloneCmd}`, 'fa-clipboard-check');
+    showToast('Comando git clone copiado', 'fa-clipboard-check');
   }).catch(() => {
     showToast('Error al copiar al portapapeles', 'fa-circle-xmark');
   });
@@ -858,9 +901,14 @@ function showToast(message, icon = 'fa-info-circle') {
 
   const toast = document.createElement('div');
   toast.className = 'toast';
-  toast.innerHTML = `<i class="fa-solid ${icon}"></i> <span>${message}</span>`;
-  
-  container.innerHTML = '';
+  const iconElement = document.createElement('i');
+  iconElement.className = `fa-solid ${/^[a-z0-9 -]+$/i.test(icon) ? icon : 'fa-info-circle'}`;
+  iconElement.setAttribute('aria-hidden', 'true');
+  const messageElement = document.createElement('span');
+  messageElement.textContent = String(message ?? '');
+  toast.append(iconElement, messageElement);
+
+  container.replaceChildren();
   container.appendChild(toast);
 
   requestAnimationFrame(() => {

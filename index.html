@@ -6,6 +6,7 @@
   <title>Portafolio & Proyectos | Ivan (musicallyivan)</title>
   <meta name="description" content="Portafolio interactivo con estilo Glassmorphism de todos mis proyectos y repositorios de GitHub. Adaptado para cualquier tipo de dispositivo." />
   <meta name="theme-color" content="#060814" />
+  <meta name="referrer" content="strict-origin-when-cross-origin" />
 
   <!-- Google Fonts & Font Awesome Icons -->
   <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -80,8 +81,10 @@
             <img 
               src="https://avatars.githubusercontent.com/u/93034871?v=4" 
               alt="Avatar de Ivan" 
-              class="nav-avatar" 
-              onerror="this.src='https://github.githubassets.com/images/modules/logos_page/GitHub-Mark.png'"
+              class="nav-avatar"
+              loading="lazy"
+              decoding="async"
+              referrerpolicy="no-referrer"
             />
             <span class="status-dot" title="Disponible para colaborar"></span>
           </div>
