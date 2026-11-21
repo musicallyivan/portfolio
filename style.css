@@ -1996,3 +1996,48 @@ body.light-theme .form-embed-wrapper { background: rgba(238, 242, 250, .75); }
   .hero-main-card { border-radius: 24px; }
   .section-header { align-items: flex-start; }
 }
+
+
+/* Security hardening: replace presentation-only inline styles with classes. */
+.mobile-github-link {
+  width: 100%;
+  padding: 0.9rem;
+}
+
+.empty-reset-button {
+  max-width: 220px;
+  margin: 0 auto;
+}
+
+.repo-card {
+  animation: repoCardEntrance 0.5s ease both;
+}
+
+@keyframes repoCardEntrance {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.lang-dot-javascript { background-color: #f7df1e; }
+.lang-dot-typescript { background-color: #3178c6; }
+.lang-dot-python { background-color: #3572a5; }
+.lang-dot-swift { background-color: #f05138; }
+.lang-dot-csharp { background-color: #178600; }
+.lang-dot-astro { background-color: #ff5a03; }
+.lang-dot-html { background-color: #e34c26; }
+.lang-dot-css { background-color: #563d7c; }
+.lang-dot-json { background-color: #a855f7; }
+.lang-dot-markdown { background-color: #0891b2; }
+.lang-dot-default { background-color: #6366f1; }
+
+@media (prefers-reduced-motion: reduce) {
+  .repo-card {
+    animation: none;
+  }
+}
