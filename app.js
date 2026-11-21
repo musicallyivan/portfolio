@@ -234,19 +234,19 @@ const CURATED_REPOS = [
   }
 ];
 
-// Color mapping for languages
-const LANGUAGE_COLORS = {
-  'JavaScript': '#f7df1e',
-  'TypeScript': '#3178c6',
-  'Python': '#3572A5',
-  'Swift': '#F05138',
-  'C#': '#178600',
-  'Astro': '#ff5a03',
-  'HTML': '#e34c26',
-  'CSS': '#563d7c',
-  'JSON': '#a855f7',
-  'Markdown': '#0891b2',
-  'Default': '#6366f1'
+// Map supported language labels to fixed CSS classes (no inline styles).
+const LANGUAGE_CLASSES = {
+  'JavaScript': 'lang-dot-javascript',
+  'TypeScript': 'lang-dot-typescript',
+  'Python': 'lang-dot-python',
+  'Swift': 'lang-dot-swift',
+  'C#': 'lang-dot-csharp',
+  'Astro': 'lang-dot-astro',
+  'HTML': 'lang-dot-html',
+  'CSS': 'lang-dot-css',
+  'JSON': 'lang-dot-json',
+  'Markdown': 'lang-dot-markdown',
+  'Default': 'lang-dot-default'
 };
 
 // ==========================================================================
@@ -326,7 +326,6 @@ function initWelcomeScreen() {
   function dismissWelcome() {
     playChime('welcome');
     welcomeOverlay.classList.add('hidden');
-    document.body.style.overflow = 'auto';
 
     // Auto-scroll to top smoothly
     window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -368,14 +367,14 @@ function initMobileMenu() {
     mobileDrawer?.classList.add('active');
     mobileDrawer?.setAttribute('aria-hidden', 'false');
     btnMobileMenu?.setAttribute('aria-expanded', 'true');
-    document.body.style.overflow = 'hidden';
+    document.body.classList.add('mobile-drawer-open');
   }
 
   function closeDrawer() {
     mobileDrawer?.classList.remove('active');
     mobileDrawer?.setAttribute('aria-hidden', 'true');
     btnMobileMenu?.setAttribute('aria-expanded', 'false');
-    document.body.style.overflow = 'auto';
+    document.body.classList.remove('mobile-drawer-open');
   }
 
   btnMobileMenu?.addEventListener('click', openDrawer);
@@ -443,53 +442,6 @@ function initTheme() {
 
 // ==========================================================================
 // 7. MOUSE GLOW & 3D TILT EFFECT (DESKTOP ONLY)
-// ==========================================================================
-function initMouseEffects() {
-  const cursorGlow = document.getElementById('cursor-glow');
-
-  // Check if device supports fine hover pointer (non-touch)
-  const isFinePointer = window.matchMedia('(hover: hover) and (pointer: fine)').matches;
-
-  if (isFinePointer) {
-    window.addEventListener('mousemove', (e) => {
-      if (cursorGlow) {
-        cursorGlow.style.left = `${e.clientX}px`;
-        cursorGlow.style.top = `${e.clientY}px`;
-      }
-    });
-
-    // 3D Card Tilt on Mouse Move
-    document.addEventListener('mousemove', (e) => {
-      const cards = document.querySelectorAll('.repo-card');
-      cards.forEach(card => {
-        const rect = card.getBoundingClientRect();
-        const x = e.clientX - rect.left;
-        const y = e.clientY - rect.top;
-
-        if (
-          e.clientX >= rect.left &&
-          e.clientX <= rect.right &&
-          e.clientY >= rect.top &&
-          e.clientY <= rect.bottom
-        ) {
-          card.style.setProperty('--mouse-x', `${x}px`);
-          card.style.setProperty('--mouse-y', `${y}px`);
-
-          const centerX = rect.width / 2;
-          const centerY = rect.height / 2;
-          const rotateX = ((y - centerY) / centerY) * -6;
-          const rotateY = ((x - centerX) / centerX) * 6;
-
-          card.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) translateY(-8px)`;
-        } else {
-          card.style.transform = '';
-        }
-      });
-    });
-  }
-}
-
-// ==========================================================================
 // 8. GITHUB REPOSITORIES FETCH & SYNC
 // ==========================================================================
 async function fetchGitHubRepos(forceNotify = false) {
@@ -711,7 +663,7 @@ function renderProjects() {
         <i class="fa-solid fa-compass-slash empty-icon"></i>
         <h3 class="empty-title">No se encontraron proyectos</h3>
         <p class="empty-desc">Intenta buscar con otros términos o limpia los filtros activos.</p>
-        <button id="btn-reset-search-filters" type="button" class="btn-card-action btn-card-primary" style="max-width: 220px; margin: 0 auto;">
+        <button id="btn-reset-search-filters" type="button" class="btn-card-action btn-card-primary empty-reset-button">
           <i class="fa-solid fa-rotate-left" aria-hidden="true"></i> Restablecer filtros
         </button>
       </div>
@@ -720,7 +672,7 @@ function renderProjects() {
     return;
   }
 
-  grid.innerHTML = filtered.map((repo, idx) => {
+  grid.innerHTML = filtered.map((repo) => {
     const repoUrl = safeExternalUrl(repo.html_url, { githubOnly: true });
     const demoUrl = safeExternalUrl(repo.homepage);
     const title = escapeHTML(repo.title || repo.name);
@@ -730,7 +682,7 @@ function renderProjects() {
     const topics = (Array.isArray(repo.topics) ? repo.topics : [])
       .filter(topic => typeof topic === 'string')
       .slice(0, 3);
-    const langColor = LANGUAGE_COLORS[repo.language] || LANGUAGE_COLORS['Default'];
+    const langClass = LANGUAGE_CLASSES[repo.language] || LANGUAGE_CLASSES['Default'];
     const formattedDate = new Date(repo.updated_at).toLocaleDateString('es-ES', {
       year: 'numeric',
       month: 'short',
@@ -740,7 +692,7 @@ function renderProjects() {
     const isLive = Boolean(demoUrl);
 
     return `
-      <article class="repo-card" style="animation: fadeInUp 0.5s ease backwards ${idx * 0.04}s">
+      <article class="repo-card">
         <div class="card-shine"></div>
         
         <div>
@@ -764,7 +716,7 @@ function renderProjects() {
           <!-- Tags & Language -->
           <div class="card-tags">
             <span class="tag-lang">
-              <span class="lang-dot" style="background-color: ${langColor};"></span>
+              <span class="lang-dot ${langClass}"></span>
               ${language}
             </span>
             ${topics.map(topic => `<span class="tag-topic">#${escapeHTML(topic)}</span>`).join('')}
@@ -950,7 +902,6 @@ document.addEventListener('DOMContentLoaded', () => {
   initWelcomeScreen();
   initMobileMenu();
   initTheme();
-  initMouseEffects();
   initSearchAndControls();
   initScrollAndNav();
 
