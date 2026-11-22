@@ -20,7 +20,11 @@ async function verifyAccess(request, env) {
     claims = JSON.parse(atob(encodedPayload.replace(/-/g, "+").replace(/_/g, "/")));
   } catch { return false; }
   const now = Math.floor(Date.now() / 1000);
-  const issuer = "https://" + String(env.CF_ACCESS_TEAM_DOMAIN).replace(/^https?:\\/\\//, "").replace(/\\/$/, "");
+  let teamDomain = String(env.CF_ACCESS_TEAM_DOMAIN);
+  if (teamDomain.startsWith("https://")) teamDomain = teamDomain.slice(8);
+  if (teamDomain.startsWith("http://")) teamDomain = teamDomain.slice(7);
+  while (teamDomain.endsWith("/")) teamDomain = teamDomain.slice(0, -1);
+  const issuer = "https://" + teamDomain;
   if (header.alg !== "RS256" || typeof claims.exp !== "number" || claims.exp <= now ||
       (typeof claims.nbf === "number" && claims.nbf > now) || claims.iss !== issuer ||
       ![].concat(claims.aud || []).includes(env.CF_ACCESS_AUD) ||
