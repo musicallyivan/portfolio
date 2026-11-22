@@ -1,0 +1,25 @@
+(() => {
+'use strict';
+const CONTENT_KEY='portfolio-phase2-content-v1', ANALYTICS_KEY='portfolio-phase2-local-analytics-v1';
+const fallback={headline:'',bio:'',timeline:[]};
+const read=(key,def)=>{try{return JSON.parse(localStorage.getItem(key))??def}catch{return def}};
+const getContent=()=>{const d=read(CONTENT_KEY,fallback);return{headline:String(d.headline||''),bio:String(d.bio||''),timeline:Array.isArray(d.timeline)?d.timeline:[]}};
+const saveContent=d=>localStorage.setItem(CONTENT_KEY,JSON.stringify(d));
+const $=id=>document.getElementById(id);
+const toast=message=>{const el=$('toast');el.textContent=message;el.classList.add('show');clearTimeout(toast.timer);toast.timer=setTimeout(()=>el.classList.remove('show'),2600)};
+const labels={overview:'Resumen',profile:'Perfil',experience:'Experiencia',projects:'Proyectos','data':'Datos y copias'};
+function navigate(view){if(!labels[view])return;document.querySelectorAll('.view').forEach(x=>x.classList.toggle('active',x.id==='view-'+view));document.querySelectorAll('[data-view]').forEach(x=>x.classList.toggle('active',x.dataset.view===view));$('crumb').textContent=labels[view];document.querySelector('.sidebar').classList.remove('open');history.replaceState(null,'','#'+view)}
+function render(){const d=getContent();$('headline').value=d.headline;$('bio').value=d.bio;renderExperience();const a=read(ANALYTICS_KEY,{views:0,days:[]});$('metric-views').textContent=Number(a.views)||0;$('metric-days').textContent=Array.isArray(a.days)?a.days.length:0;$('metric-timeline').textContent=d.timeline.length;countFields()}
+function countFields(){$('headline-count').textContent=$('headline').value.length+'/120';$('bio-count').textContent=$('bio').value.length+'/600'}
+function renderExperience(){const items=getContent().timeline,root=$('experience-list');root.replaceChildren();$('experience-count').textContent=items.length+' elementos';if(!items.length){const p=document.createElement('p');p.className='empty-state';p.textContent='Todavía no has añadido ninguna etapa.';root.append(p);return}items.forEach((item,index)=>{const card=document.createElement('article');card.className='experience-item';const title=document.createElement('b');title.textContent=item.title||'Sin título';const period=document.createElement('small');period.textContent=item.period||'Sin periodo';const desc=document.createElement('p');desc.textContent=item.description||'';const remove=document.createElement('button');remove.type='button';remove.textContent='Eliminar elemento';remove.addEventListener('click',()=>{const d=getContent();d.timeline.splice(index,1);saveContent(d);renderExperience();$('metric-timeline').textContent=d.timeline.length;toast('Elemento eliminado del borrador local.')});card.append(title,period,desc,remove);root.append(card)})}
+document.querySelectorAll('[data-view]').forEach(a=>a.addEventListener('click',()=>navigate(a.dataset.view)));
+document.querySelectorAll('[data-go]').forEach(a=>a.addEventListener('click',()=>navigate(a.dataset.go)));
+$('menu-toggle').addEventListener('click',()=>$('sidebar').classList.toggle('open'));
+$('headline').addEventListener('input',countFields);$('bio').addEventListener('input',countFields);
+$('save-profile').addEventListener('click',()=>{const d=getContent();d.headline=$('headline').value.trim();d.bio=$('bio').value.trim();saveContent(d);$('profile-status').textContent='Guardado en este navegador';toast('Perfil guardado como borrador local.')});
+$('experience-form').addEventListener('submit',e=>{e.preventDefault();const d=getContent();d.timeline.push({title:$('exp-title').value.trim(),period:$('exp-period').value.trim(),description:$('exp-description').value.trim()});saveContent(d);e.target.reset();renderExperience();$('metric-timeline').textContent=d.timeline.length;toast('Experiencia añadida al borrador local.')});
+$('export-data').addEventListener('click',()=>{const payload={version:1,exportedAt:new Date().toISOString(),...getContent()};const url=URL.createObjectURL(new Blob([JSON.stringify(payload,null,2)],{type:'application/json'}));const a=document.createElement('a');a.href=url;a.download='musicallyivan-portfolio-backup.json';a.click();URL.revokeObjectURL(url);toast('Copia JSON preparada.')});
+$('import-data').addEventListener('change',async e=>{const f=e.target.files?.[0];if(!f)return;try{const raw=JSON.parse(await f.text());if(!Array.isArray(raw.timeline))throw Error('Formato incorrecto');const clean={headline:String(raw.headline||'').slice(0,120),bio:String(raw.bio||'').slice(0,600),timeline:raw.timeline.slice(0,100).map(x=>({title:String(x.title||'').slice(0,100),period:String(x.period||'').slice(0,60),description:String(x.description||'').slice(0,400)}))};saveContent(clean);render();toast('Copia importada correctamente.')}catch{toast('No se pudo importar: revisa el archivo JSON.')}e.target.value=''});
+$('today').textContent=new Intl.DateTimeFormat('es-ES',{dateStyle:'long'}).format(new Date());
+render();const initial=location.hash.slice(1);if(labels[initial])navigate(initial);
+})();
