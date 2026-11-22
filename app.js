@@ -234,6 +234,43 @@ const CURATED_REPOS = [
   }
 ];
 
+// Curated presentation metadata. Keep screenshots empty until real captures are added.
+const PROJECT_METADATA = {
+  mediaflow: { featured: true, category: 'Multimedia', screenshots: [], demoStatus: 'live' },
+  SpiritDex: { featured: true, category: 'Gaming', screenshots: [], demoStatus: 'live' },
+  'Marvel-Tracker': { featured: true, category: 'Entretenimiento', screenshots: [], demoStatus: 'live' },
+  'insidious-tracker': { featured: true, category: 'Entretenimiento', screenshots: [], demoStatus: 'live' },
+  'trackers-hub': { featured: true, category: 'Web', screenshots: [], demoStatus: 'live' },
+  'musicallyivan-web': { featured: true, category: 'Web', screenshots: [], demoStatus: 'live' },
+  'plugin.video.streamhub': { category: 'Multimedia', screenshots: [], demoStatus: 'live' },
+  MyVLC: { category: 'Multimedia', screenshots: [], demoStatus: 'development' },
+  'iesmusicallyivan-app': { category: 'Aplicaciones', screenshots: [], demoStatus: 'development' },
+  taskapp_by_ivan: { category: 'Productividad', screenshots: [], demoStatus: 'development' },
+  elementun: { category: 'Herramientas', screenshots: [], demoStatus: 'development' }
+};
+
+function enrichRepo(repo) {
+  const metadata = PROJECT_METADATA[repo.name] || {};
+  return {
+    ...repo,
+    featured: Boolean(metadata.featured),
+    category: metadata.category || inferProjectCategory(repo),
+    screenshots: Array.isArray(metadata.screenshots) ? metadata.screenshots : [],
+    demoStatus: metadata.demoStatus || (repo.homepage ? 'live' : 'unavailable')
+  };
+}
+
+function inferProjectCategory(repo) {
+  const topics = (repo.topics || []).join(' ').toLowerCase();
+  if (/game|gaming|pokemon|pokedex/.test(topics)) return 'Gaming';
+  if (/media|audio|video|stream|music/.test(topics)) return 'Multimedia';
+  if (/tracker|marvel|cinema|horror/.test(topics)) return 'Entretenimiento';
+  if (/task|productivity/.test(topics)) return 'Productividad';
+  if (/automation|tools|utilities/.test(topics)) return 'Herramientas';
+  if (/web|frontend|portfolio|css|html/.test(topics)) return 'Web';
+  return 'Aplicaciones';
+}
+
 // Map supported language labels to fixed CSS classes (no inline styles).
 const LANGUAGE_CLASSES = {
   'JavaScript': 'lang-dot-javascript',
@@ -272,11 +309,13 @@ function safeExternalUrl(value, { githubOnly = false } = {}) {
 // 2. STATE MANAGEMENT
 // ==========================================================================
 const state = {
-  repos: [...CURATED_REPOS],
+  repos: CURATED_REPOS.map(enrichRepo),
   activeFilter: 'all',
   searchQuery: '',
   sortBy: 'recent',
-  theme: localStorage.getItem('theme') || 'dark'
+  theme: localStorage.getItem('theme') || 'dark',
+  profile: null,
+  lastSync: 0
 };
 
 // ==========================================================================
@@ -474,11 +513,28 @@ async function fetchGitHubRepos(forceNotify = false) {
           icon: curated?.icon || getLanguageIcon(apiRepo.language),
           stars: apiRepo.stargazers_count ?? 0,
           forks: apiRepo.forks_count ?? 0,
-          updated_at: apiRepo.updated_at || curated?.updated_at || new Date().toISOString()
+          updated_at: apiRepo.updated_at || curated?.updated_at || new Date().toISOString(),
+          ...PROJECT_METADATA[apiRepo.name] ? {
+            featured: Boolean(PROJECT_METADATA[apiRepo.name].featured),
+            category: PROJECT_METADATA[apiRepo.name].category || inferProjectCategory(apiRepo),
+            screenshots: PROJECT_METADATA[apiRepo.name].screenshots || [],
+            demoStatus: PROJECT_METADATA[apiRepo.name].demoStatus || (apiRepo.homepage ? 'live' : 'unavailable')
+          } : {
+            ...enrichRepo({ ...apiRepo, title: apiRepo.name }).valueOf()
+          }
         };
       });
 
-      state.repos = mergedRepos;
+      state.repos = mergedRepos.map(repo => enrichRepo(repo));
+      state.lastSync = Date.now();
+      try {
+        const profileResponse = await fetch(`https://api.github.com/users/${GITHUB_USERNAME}`, {
+          headers: { 'Accept': 'application/vnd.github.v3+json' }
+        });
+        if (profileResponse.ok) state.profile = await profileResponse.json();
+      } catch (profileError) {
+        console.warn('No se pudieron actualizar las estadísticas del perfil:', profileError);
+      }
       updateStats();
       renderFilterChips();
       renderProjects();
@@ -489,7 +545,7 @@ async function fetchGitHubRepos(forceNotify = false) {
     }
   } catch (error) {
     console.warn('Usando catálogo local enriquecido:', error);
-    state.repos = [...CURATED_REPOS];
+    state.repos = CURATED_REPOS.map(enrichRepo);
     updateStats();
     renderFilterChips();
     renderProjects();
@@ -523,16 +579,19 @@ function updateStats() {
   const totalLanguagesEl = document.getElementById('stat-total-languages');
   const totalDemosEl = document.getElementById('stat-total-demos');
   const totalStarsEl = document.getElementById('stat-total-stars');
+  const followersEl = document.getElementById('stat-total-followers');
 
   const totalRepos = state.repos.length;
   const uniqueLanguages = new Set(state.repos.map(r => r.language).filter(Boolean)).size;
   const totalDemos = state.repos.filter(r => r.homepage).length;
   const totalStars = state.repos.reduce((acc, r) => acc + (r.stars || 0), 0);
+  const totalFollowers = Number(state.profile?.followers || 0);
 
   if (totalReposEl) animateCounter(totalReposEl, totalRepos);
   if (totalLanguagesEl) animateCounter(totalLanguagesEl, uniqueLanguages);
   if (totalDemosEl) animateCounter(totalDemosEl, totalDemos);
   if (totalStarsEl) animateCounter(totalStarsEl, totalStars);
+  if (followersEl) animateCounter(followersEl, totalFollowers);
 }
 
 function animateCounter(element, targetValue) {
@@ -563,40 +622,32 @@ function renderFilterChips() {
   const container = document.getElementById('filter-chips-container');
   if (!container) return;
 
-  // Compute counts
-  const counts = {
-    all: state.repos.length,
-    demos: state.repos.filter(r => Boolean(r.homepage)).length
-  };
-
-  state.repos.forEach(repo => {
-    const lang = repo.language || 'Otros';
-    counts[lang] = (counts[lang] || 0) + 1;
-  });
-
-  const mainFilters = [
-    { id: 'all', label: 'Todos', count: counts.all, icon: 'fa-globe' },
-    { id: 'demos', label: 'Demos en Vivo', count: counts.demos, icon: 'fa-circle-play' },
-    { id: 'Python', label: 'Python', count: counts['Python'] || 0, icon: 'fa-python' },
-    { id: 'JavaScript', label: 'JavaScript', count: counts['JavaScript'] || 0, icon: 'fa-js' },
-    { id: 'TypeScript', label: 'TypeScript', count: counts['TypeScript'] || 0, icon: 'fa-code' },
-    { id: 'Swift', label: 'Swift', count: counts['Swift'] || 0, icon: 'fa-swift' },
-    { id: 'C#', label: 'C#', count: counts['C#'] || 0, icon: 'fa-cube' },
-    { id: 'Astro', label: 'Astro', count: counts['Astro'] || 0, icon: 'fa-rocket' }
+  const filters = [
+    { id: 'all', label: 'Todos', icon: 'fa-globe', count: state.repos.length },
+    { id: 'featured', label: 'Destacados', icon: 'fa-star', count: state.repos.filter(r => r.featured).length },
+    { id: 'demos', label: 'Demos', icon: 'fa-circle-play', count: state.repos.filter(r => r.demoStatus === 'live' && r.homepage).length }
   ];
+  const languages = [...new Set(state.repos.map(r => r.language || 'Otros'))].sort();
+  const categories = [...new Set(state.repos.map(r => r.category || 'Aplicaciones'))].sort();
 
-  container.innerHTML = mainFilters
-    .filter(f => f.count > 0 || f.id === 'all')
-    .map(f => `
-      <button type="button" class="filter-chip ${state.activeFilter === f.id ? 'active' : ''}"
-        data-filter="${escapeHTML(f.id)}" aria-pressed="${state.activeFilter === f.id}">
-        <i class="${f.icon.startsWith('fa-brands') ? 'fa-brands' : 'fa-solid'} ${escapeHTML(f.icon)}" aria-hidden="true"></i>
-        <span>${escapeHTML(f.label)}</span>
-        <span class="chip-count">${f.count}</span>
-      </button>
-    `).join('');
+  languages.forEach(language => filters.push({
+    id: `lang:${language}`, label: language, icon: 'fa-code',
+    count: state.repos.filter(r => (r.language || 'Otros') === language).length
+  }));
+  categories.forEach(category => filters.push({
+    id: `category:${category}`, label: category, icon: 'fa-layer-group',
+    count: state.repos.filter(r => (r.category || 'Aplicaciones') === category).length
+  }));
 
-  container.querySelectorAll('[data-filter]').forEach((button) => {
+  container.innerHTML = filters.filter(f => f.count > 0 || f.id === 'all').map(f => `
+    <button type="button" class="filter-chip ${state.activeFilter === f.id ? 'active' : ''}"
+      data-filter="${escapeHTML(f.id)}" aria-pressed="${state.activeFilter === f.id}">
+      <i class="fa-solid ${escapeHTML(f.icon)}" aria-hidden="true"></i>
+      <span>${escapeHTML(f.label)}</span><span class="chip-count">${f.count}</span>
+    </button>
+  `).join('');
+
+  container.querySelectorAll('[data-filter]').forEach(button => {
     button.addEventListener('click', () => setFilter(button.dataset.filter));
   });
 }
@@ -618,13 +669,10 @@ function renderProjects() {
 
   // Filter repos
   let filtered = state.repos.filter(repo => {
-    if (state.activeFilter === 'demos') {
-      if (!repo.homepage) return false;
-    } else if (state.activeFilter !== 'all') {
-      if ((repo.language || '').toLowerCase() !== state.activeFilter.toLowerCase()) {
-        return false;
-      }
-    }
+    if (state.activeFilter === 'demos' && !(repo.demoStatus === 'live' && repo.homepage)) return false;
+    if (state.activeFilter === 'featured' && !repo.featured) return false;
+    if (state.activeFilter.startsWith('lang:') && (repo.language || 'Otros') !== state.activeFilter.slice(5)) return false;
+    if (state.activeFilter.startsWith('category:') && (repo.category || 'Aplicaciones') !== state.activeFilter.slice(9)) return false;
 
     if (state.searchQuery.trim() !== '') {
       const q = state.searchQuery.toLowerCase();
@@ -648,6 +696,7 @@ function renderProjects() {
     } else if (state.sortBy === 'stars') {
       return (b.stars || 0) - (a.stars || 0);
     } else {
+      if (a.featured !== b.featured) return Number(b.featured) - Number(a.featured);
       return new Date(b.updated_at) - new Date(a.updated_at);
     }
   });
@@ -689,7 +738,8 @@ function renderProjects() {
       day: 'numeric'
     });
 
-    const isLive = Boolean(demoUrl);
+    const isLive = Boolean(demoUrl) && repo.demoStatus === 'live';
+    const statusLabel = repo.demoStatus === 'live' ? 'Demo disponible' : repo.demoStatus === 'development' ? 'En desarrollo' : 'Sin demo';
 
     return `
       <article class="repo-card">
@@ -702,7 +752,8 @@ function renderProjects() {
               <i class="${icon}" aria-hidden="true"></i>
             </div>
             <div class="card-badges">
-              ${isLive ? `<span class="badge-live-demo"><i class="fa-solid fa-bolt"></i> Demo Online</span>` : ''}
+              ${isLive ? `<span class="badge-live-demo"><i class="fa-solid fa-bolt"></i> Demo Online</span>` : `<span class="badge-demo-status status-${escapeHTML(repo.demoStatus)}">${escapeHTML(statusLabel)}</span>`}
+              ${repo.featured ? '<span class="badge-featured"><i class="fa-solid fa-star"></i> Destacado</span>' : ''}
               <span class="badge-public">Público</span>
             </div>
           </div>
@@ -741,6 +792,9 @@ function renderProjects() {
 
           <!-- Card Actions -->
           <div class="card-actions">
+            <button class="btn-card-action btn-card-secondary" type="button" data-project-detail="${escapeHTML(repo.name)}">
+              <i class="fa-solid fa-circle-info" aria-hidden="true"></i> Detalles
+            </button>
             ${isLive ? `
               <a href="${escapeHTML(demoUrl)}" target="_blank" rel="noopener noreferrer" class="btn-card-action btn-card-primary" title="Abrir demo en vivo">
                 <i class="fa-solid fa-arrow-up-right-from-square"></i> Demo
@@ -758,6 +812,9 @@ function renderProjects() {
     `;
   }).join('');
 
+  grid.querySelectorAll('[data-project-detail]').forEach(button => {
+    button.addEventListener('click', () => openProjectDetail(button.dataset.projectDetail));
+  });
   grid.querySelectorAll('[data-clone-url]').forEach((button) => {
     button.addEventListener('click', () => copyCloneUrl(button.dataset.cloneUrl));
   });
@@ -895,6 +952,99 @@ function initScrollAndNav() {
   }
 }
 
+
+function openProjectDetail(repoName) {
+  const repo = state.repos.find(item => item.name === repoName);
+  if (!repo) return;
+  const detail = document.getElementById('project-detail');
+  const content = document.getElementById('project-detail-content');
+  const projects = document.getElementById('projects');
+  const controls = document.querySelector('.controls-section');
+  const hero = document.getElementById('hero');
+  const safeRepo = safeExternalUrl(repo.html_url, { githubOnly: true });
+  const safeDemo = safeExternalUrl(repo.homepage);
+  const screenshots = (repo.screenshots || []).map(safeExternalUrl).filter(Boolean);
+  const title = escapeHTML(repo.title || repo.name);
+  const description = escapeHTML(repo.description || 'Proyecto de código abierto.');
+  const status = repo.demoStatus === 'live' && safeDemo ? 'Demo disponible' : repo.demoStatus === 'development' ? 'En desarrollo' : 'Sin demo disponible';
+  content.innerHTML = `
+    <article class="project-detail-card">
+      <header class="project-detail-header">
+        <span class="section-badge"><i class="fa-solid fa-layer-group"></i> FICHA DEL PROYECTO</span>
+        <h1>${title}</h1>
+        <p>${description}</p>
+        <div class="detail-meta">
+          <span><i class="fa-solid fa-code"></i> ${escapeHTML(repo.language || 'Código')}</span>
+          <span><i class="fa-solid fa-folder"></i> ${escapeHTML(repo.category || 'Aplicaciones')}</span>
+          <span><i class="fa-solid fa-star"></i> ${Number(repo.stars || 0)} estrellas</span>
+          <span class="badge-demo-status">${escapeHTML(status)}</span>
+        </div>
+      </header>
+      <section class="detail-gallery" aria-label="Capturas del proyecto">
+        <h2>Capturas del proyecto</h2>
+        ${screenshots.length ? screenshots.map((src,index) => `<img src="${escapeHTML(src)}" alt="Captura ${index+1} de ${title}" loading="lazy">`).join('') : '<div class="detail-gallery-empty"><i class="fa-regular fa-images"></i><p>Las capturas de este proyecto se añadirán próximamente.</p></div>'}
+      </section>
+      <section class="detail-description">
+        <h2>Sobre este proyecto</h2><p>${description}</p>
+        <p>Última actualización: ${new Date(repo.updated_at).toLocaleDateString('es-ES')}</p>
+      </section>
+      <div class="detail-actions">
+        ${safeRepo ? `<a class="btn-card-action btn-card-primary" href="${escapeHTML(safeRepo)}" target="_blank" rel="noopener noreferrer"><i class="fa-brands fa-github"></i> Ver código</a>` : ''}
+        ${safeDemo && repo.demoStatus === 'live' ? `<a class="btn-card-action btn-card-secondary" href="${escapeHTML(safeDemo)}" target="_blank" rel="noopener noreferrer"><i class="fa-solid fa-arrow-up-right-from-square"></i> Abrir demo</a>` : ''}
+      </div>
+    </article>`;
+  if (projects) projects.hidden = true;
+  if (controls) controls.hidden = true;
+  if (hero) hero.hidden = true;
+  detail.hidden = false;
+  history.pushState({ project: repo.name }, '', `#project/${encodeURIComponent(repo.name)}`);
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+function closeProjectDetail(updateHistory = true) {
+  const detail = document.getElementById('project-detail');
+  const projects = document.getElementById('projects');
+  const controls = document.querySelector('.controls-section');
+  const hero = document.getElementById('hero');
+  if (detail) detail.hidden = true;
+  if (projects) projects.hidden = false;
+  if (controls) controls.hidden = false;
+  if (hero) hero.hidden = false;
+  if (updateHistory && location.hash.startsWith('#project/')) history.pushState({}, '', '#projects');
+}
+function handleProjectRoute() {
+  const match = location.hash.match(/^#project\/(.+)$/);
+  if (match) {
+    const name = decodeURIComponent(match[1]);
+    if (state.repos.some(repo => repo.name === name)) openProjectDetail(name);
+  } else {
+    closeProjectDetail(false);
+  }
+}
+function initProjectDetails() {
+  document.getElementById('btn-detail-back')?.addEventListener('click', () => closeProjectDetail());
+  window.addEventListener('popstate', () => {
+    const match = location.hash.match(/^#project\/(.+)$/);
+    if (match) {
+      const name = decodeURIComponent(match[1]);
+      if (state.repos.some(repo => repo.name === name)) openProjectDetail(name);
+    } else closeProjectDetail(false);
+  });
+  if (location.hash.startsWith('#project/')) {
+    const name = decodeURIComponent(location.hash.slice(9));
+    const repo = state.repos.find(item => item.name === name);
+    if (repo) openProjectDetail(name);
+  }
+}
+function initAutomaticGitHubSync() {
+  const syncIfStale = () => {
+    if (document.visibilityState !== 'visible') return;
+    if (Date.now() - state.lastSync < 5 * 60 * 1000) return;
+    fetchGitHubRepos(false);
+  };
+  window.addEventListener('focus', syncIfStale);
+  document.addEventListener('visibilitychange', syncIfStale);
+}
+
 // ==========================================================================
 // 16. INITIALIZATION BOOTSTRAP
 // ==========================================================================
@@ -904,6 +1054,8 @@ document.addEventListener('DOMContentLoaded', () => {
   initTheme();
   initSearchAndControls();
   initScrollAndNav();
+  initProjectDetails();
+  initAutomaticGitHubSync();
 
   // Initial render with curated database
   updateStats();
