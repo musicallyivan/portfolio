@@ -20,7 +20,9 @@ async function verifyAccess(request, env) {
     claims = JSON.parse(atob(encodedPayload.replace(/-/g, "+").replace(/_/g, "/")));
   } catch { return false; }
   const now = Math.floor(Date.now() / 1000);
-  if (header.alg !== "RS256" || claims.exp <= now || claims.nbf > now ||
+  const issuer = "https://" + String(env.CF_ACCESS_TEAM_DOMAIN).replace(/^https?:\\/\\//, "").replace(/\\/$/, "");
+  if (header.alg !== "RS256" || typeof claims.exp !== "number" || claims.exp <= now ||
+      (typeof claims.nbf === "number" && claims.nbf > now) || claims.iss !== issuer ||
       ![].concat(claims.aud || []).includes(env.CF_ACCESS_AUD) ||
       String(claims.email || "").toLowerCase() !== "musicallyivan2@gmail.com") return false;
   const team = String(env.CF_ACCESS_TEAM_DOMAIN).replace(/^https?:\/\//, "").replace(/\/$/, "");
