@@ -8,6 +8,31 @@
 // 1. REPOSITORIES DATABASE & CURATED METADATA
 // ==========================================================================
 const GITHUB_USERNAME = 'musicallyivan';
+const PORTFOLIO_UI={es:{all:'Todos',featured:'Destacados',demos:'Demos',applications:'Aplicaciones',shown:(n,t)=>'Mostrando '+n+' de '+t+' proyectos',emptyTitle:'No se encontraron proyectos',emptyDesc:'Intenta buscar con otros términos o limpia los filtros activos.',reset:'Restablecer filtros',demoLive:'Demo disponible',development:'En desarrollo',noDemo:'Sin demo',public:'Público',details:'Detalles',demo:'Demo',code:'Código',dark:'Modo Oscuro activado',light:'Modo Claro activado',syncDone:'Repositorios sincronizados con GitHub',syncCache:'Mostrando versión optimizada en caché',cloneInvalid:'URL de repositorio no válida',clipboardUnavailable:'El portapapeles no está disponible en este navegador',cloneCopied:'Comando git clone copiado',copyError:'Error al copiar al portapapeles'},en:{all:'All',featured:'Featured',demos:'Demos',applications:'Applications',shown:(n,t)=>'Showing '+n+' of '+t+' projects',emptyTitle:'No projects found',emptyDesc:'Try different search terms or clear the active filters.',reset:'Reset filters',demoLive:'Demo available',development:'In development',noDemo:'No demo',public:'Public',details:'Details',demo:'Demo',code:'Code',dark:'Dark mode enabled',light:'Light mode enabled',syncDone:'Repositories synced with GitHub',syncCache:'Showing optimized cached version',cloneInvalid:'Invalid repository URL',clipboardUnavailable:'Clipboard is unavailable in this browser',cloneCopied:'Git clone command copied',copyError:'Could not copy to clipboard'}};
+const PROJECT_DESCRIPTIONS_EN = {
+mediaflow:'A Windows and web application for converting, trimming and processing audio, video and image files into multiple formats using high-performance FFmpeg.',
+SpiritDex:'An interactive encyclopedia and Pokédex with a futuristic interface, instant search by type and generation, base-stat calculations and smooth creature animations.',
+'Marvel-Tracker':'An interactive platform for exploring the Marvel Cinematic Universe timeline, including films, Disney+ series, phases, release dates and detailed information.',
+'insidious-tracker':'An interactive chronological guide to the Insidious horror franchise, featuring film connections, characters, entities and watch tracking.',
+'trackers-hub':'A central hub for tracking tools, dashboards and interactive collections for TV, movies and projects, presented with a minimal glassmorphism interface.',
+'musicallyivan-web':'A fast personal website and portfolio built with Astro and Tailwind CSS, focused on Core Web Vitals, performance and responsive design.',
+'plugin.video.streamhub':'A multimedia add-on and entertainment platform for Kodi, supporting HD streams, channel organization and metadata management.',
+'youtube-mp3-downloader':'A Python script and tool for extracting, converting and downloading high-quality MP3 audio from YouTube videos.',
+MyVLC:'A native desktop media player built with C# and .NET, featuring hardware acceleration, subtitles, playlists and an audio equalizer.',
+'iesmusicallyivan-app':'A native iOS mobile application built with Swift, following Apple Human Interface Guidelines and modern architecture.',
+'EJEMPLOS-PYTHON':'An educational repository with practical examples of algorithms, data structures, file handling, object-oriented programming and Python automation scripts.',
+archivo_secreto:'An interactive vintage mystery-themed website for preserving, displaying and reading digital letters with animated effects.',
+'mcu-database':'A structured JSON database covering the Marvel Studios canon, including timelines, directors, actors, box office data and appearances.',
+taskapp_by_ivan:'An interactive task and productivity manager with local storage, labels, due dates and priority management.',
+elementun:'A toolkit of automation utilities for recurring tasks, text processing and workflow optimization.',
+musicallyivannew:'A CSS experimentation space for testing Grid, Flexbox, visual effects and interface micro-interactions.',
+musicallyivan:'The configuration and visual design of the main GitHub profile, with dynamic metrics, language statistics and a professional presentation.'
+};
+function projectDescription(repo){if(document.documentElement.lang==='en'&&PROJECT_DESCRIPTIONS_EN[repo.name])return PROJECT_DESCRIPTIONS_EN[repo.name];return repo.description||ui('noDescription')}
+function ui(k){return (PORTFOLIO_UI[document.documentElement.lang==='en'?'en':'es'][k]||PORTFOLIO_UI.es[k]||k)}
+function categoryName(v){const map={Aplicaciones:'applications'};return map[v]?ui(map[v]):v}
+window.addEventListener('portfolio:languagechange',()=>{renderFilterChips();renderProjects()});
+
 
 // Detailed data for all repositories with rich descriptions and live URLs
 const CURATED_REPOS = [
@@ -545,7 +570,7 @@ async function fetchGitHubRepos(forceNotify = false) {
       }
 
       if (forceNotify) {
-        showToast('Repositorios sincronizados con GitHub', 'fa-github');
+        showToast(ui('syncDone'), 'fa-github');
       }
     }
   } catch (error) {
@@ -556,7 +581,7 @@ async function fetchGitHubRepos(forceNotify = false) {
     renderProjects();
 
     if (forceNotify) {
-      showToast('Mostrando versión optimizada en caché', 'fa-database');
+      showToast(ui('syncCache'), 'fa-database');
     }
   } finally {
     if (syncBtn) syncBtn.classList.remove('loading');
@@ -628,9 +653,9 @@ function renderFilterChips() {
   if (!container) return;
 
   const filters = [
-    { id: 'all', label: 'Todos', icon: 'fa-globe', count: state.repos.length },
-    { id: 'featured', label: 'Destacados', icon: 'fa-star', count: state.repos.filter(r => r.featured).length },
-    { id: 'demos', label: 'Demos', icon: 'fa-circle-play', count: state.repos.filter(r => r.demoStatus === 'live' && r.homepage).length }
+    { id: 'all', label: ui('all'), icon: 'fa-globe', count: state.repos.length },
+    { id: 'featured', label: ui('featured'), icon: 'fa-star', count: state.repos.filter(r => r.featured).length },
+    { id: 'demos', label: ui('demos'), icon: 'fa-circle-play', count: state.repos.filter(r => r.demoStatus === 'live' && r.homepage).length }
   ];
   const languages = [...new Set(state.repos.map(r => r.language || 'Otros'))].sort();
   const categories = [...new Set(state.repos.map(r => r.category || 'Aplicaciones'))].sort();
@@ -648,7 +673,7 @@ function renderFilterChips() {
     <button type="button" class="filter-chip ${state.activeFilter === f.id ? 'active' : ''}"
       data-filter="${escapeHTML(f.id)}" aria-pressed="${state.activeFilter === f.id}">
       <i class="fa-solid ${escapeHTML(f.icon)}" aria-hidden="true"></i>
-      <span>${escapeHTML(f.label)}</span><span class="chip-count">${f.count}</span>
+      <span>${escapeHTML(f.id.startsWith('category:') ? categoryName(f.label) : f.label)}</span><span class="chip-count">${f.count}</span>
     </button>
   `).join('');
 
@@ -709,15 +734,15 @@ function renderProjects() {
 
   // Update counter
   if (countEl) {
-    countEl.textContent = `Mostrando ${filtered.length} de ${state.repos.length} proyectos`;
+    countEl.textContent = ui('shown')(filtered.length,state.repos.length);
   }
 
   if (filtered.length === 0) {
     grid.innerHTML = `
       <div class="empty-state">
         <i class="fa-solid fa-compass-slash empty-icon"></i>
-        <h3 class="empty-title">No se encontraron proyectos</h3>
-        <p class="empty-desc">Intenta buscar con otros términos o limpia los filtros activos.</p>
+        <h3 class="empty-title">${escapeHTML(ui('emptyTitle'))}</h3>
+        <p class="empty-desc">${escapeHTML(ui('emptyDesc'))}</p>
         <button id="btn-reset-search-filters" type="button" class="btn-card-action btn-card-primary empty-reset-button">
           <i class="fa-solid fa-rotate-left" aria-hidden="true"></i> Restablecer filtros
         </button>
@@ -731,21 +756,21 @@ function renderProjects() {
     const repoUrl = safeExternalUrl(repo.html_url, { githubOnly: true });
     const demoUrl = safeExternalUrl(repo.homepage);
     const title = escapeHTML(repo.title || repo.name);
-    const description = escapeHTML(repo.description || '');
+    const description = escapeHTML(projectDescription(repo));
     const language = escapeHTML(repo.language || 'Código');
     const icon = escapeHTML(repo.icon || 'fa-solid fa-code-branch');
     const topics = (Array.isArray(repo.topics) ? repo.topics : [])
       .filter(topic => typeof topic === 'string')
       .slice(0, 3);
     const langClass = LANGUAGE_CLASSES[repo.language] || LANGUAGE_CLASSES['Default'];
-    const formattedDate = new Date(repo.updated_at).toLocaleDateString('es-ES', {
+    const formattedDate = new Date(repo.updated_at).toLocaleDateString(document.documentElement.lang === 'en' ? 'en-US' : 'es-ES', {
       year: 'numeric',
       month: 'short',
       day: 'numeric'
     });
 
     const isLive = Boolean(demoUrl) && repo.demoStatus === 'live';
-    const statusLabel = repo.demoStatus === 'live' ? 'Demo disponible' : repo.demoStatus === 'development' ? 'En desarrollo' : 'Sin demo';
+    const statusLabel = repo.demoStatus === 'live' ? ui('demoLive') : repo.demoStatus === 'development' ? ui('development') : ui('noDemo');
 
     return `
       <article class="repo-card">
@@ -758,9 +783,9 @@ function renderProjects() {
               <i class="${icon}" aria-hidden="true"></i>
             </div>
             <div class="card-badges">
-              ${isLive ? `<span class="badge-live-demo"><i class="fa-solid fa-bolt"></i> Demo disponible</span>` : `<span class="badge-demo-status status-${escapeHTML(repo.demoStatus)}">${escapeHTML(statusLabel)}</span>`}
-              ${repo.featured ? '<span class="badge-featured"><i class="fa-solid fa-star"></i> Destacado</span>' : ''}
-              <span class="badge-public">Público</span>
+              ${isLive ? `<span class="badge-live-demo"><i class="fa-solid fa-bolt"></i> ${escapeHTML(ui('demoLive'))}</span>` : `<span class="badge-demo-status status-${escapeHTML(repo.demoStatus)}">${escapeHTML(statusLabel)}</span>`}
+              ${repo.featured ? `<span class="badge-featured"><i class="fa-solid fa-star"></i> ${escapeHTML(ui('featured'))}</span>` : ''}
+              <span class="badge-public">${escapeHTML(ui('public'))}</span>
             </div>
           </div>
 
@@ -784,14 +809,14 @@ function renderProjects() {
           <!-- Card Stats Footer -->
           <div class="card-meta">
             <div class="meta-stats">
-              <span class="meta-stat" title="Estrellas">
+              <span class="meta-stat" title="${document.documentElement.lang === 'en' ? 'Stars' : 'Estrellas'}">
                 <i class="fa-solid fa-star"></i> ${repo.stars || 0}
               </span>
               <span class="meta-stat" title="Forks">
                 <i class="fa-solid fa-code-fork"></i> ${repo.forks || 0}
               </span>
             </div>
-            <span class="meta-date" title="Última actualización">
+            <span class="meta-date" title="${document.documentElement.lang === 'en' ? 'Last updated' : 'Última actualización'}">
               <i class="fa-regular fa-clock"></i> ${formattedDate}
             </span>
           </div>
@@ -904,7 +929,7 @@ window.copyCloneUrl = function(repoUrl) {
     return;
   }
   navigator.clipboard.writeText(cloneCmd).then(() => {
-    showToast('Comando git clone copiado', 'fa-clipboard-check');
+    showToast(ui('cloneCopied'), 'fa-clipboard-check');
   }).catch(() => {
     showToast('Error al copiar al portapapeles', 'fa-circle-xmark');
   });
@@ -970,13 +995,16 @@ function openProjectDetail(repoName, updateHistory = true) {
   const safeRepo = safeExternalUrl(repo.html_url, { githubOnly: true });
   const safeDemo = safeExternalUrl(repo.homepage);
   const screenshots = (repo.screenshots || []).map(safeExternalUrl).filter(Boolean);
+  const galleryHTML = screenshots.length
+    ? screenshots.map((src, index) => '<img src="' + escapeHTML(src) + '" alt="Captura ' + (index + 1) + ' de ' + escapeHTML(repo.title || repo.name) + '" loading="lazy">').join('')
+    : '<div class="detail-gallery-empty"><i class="fa-regular fa-images"></i><p>' + escapeHTML(ui('screenshotsSoon')) + '</p></div>';
   const title = escapeHTML(repo.title || repo.name);
-  const description = escapeHTML(repo.description || 'Proyecto de código abierto.');
-  const status = repo.demoStatus === 'live' && safeDemo ? 'Demo disponible' : repo.demoStatus === 'development' ? 'En desarrollo' : 'Sin demo disponible';
+  const description = escapeHTML(projectDescription(repo));
+  const status = repo.demoStatus === 'live' && safeDemo ? ui('demoLive') : repo.demoStatus === 'development' ? ui('development') : ui('noDemo');
   content.innerHTML = `
     <article class="project-detail-card">
       <header class="project-detail-header">
-        <span class="section-badge"><i class="fa-solid fa-layer-group"></i> FICHA DEL PROYECTO</span>
+        <span class="section-badge"><i class="fa-solid fa-layer-group"></i> ${escapeHTML(ui('projectOpen'))}</span>
         <h1>${title}</h1>
         <p>${description}</p>
         <div class="detail-meta">
@@ -988,15 +1016,15 @@ function openProjectDetail(repoName, updateHistory = true) {
       </header>
       <section class="detail-gallery" aria-label="Capturas del proyecto">
         <h2>Capturas del proyecto</h2>
-        ${screenshots.length ? screenshots.map((src,index) => `<img src="${escapeHTML(src)}" alt="Captura ${index+1} de ${title}" loading="lazy">`).join('') : '<div class="detail-gallery-empty"><i class="fa-regular fa-images"></i><p>Las capturas de este proyecto se añadirán próximamente.</p></div>'}
+        ${galleryHTML}
       </section>
       <section class="detail-description">
-        <h2>Sobre este proyecto</h2><p>${description}</p>
-        <p>Última actualización: ${new Date(repo.updated_at).toLocaleDateString('es-ES')}</p>
+        <h2>${escapeHTML(ui('aboutProject'))}</h2><p>${description}</p>
+        <p>${document.documentElement.lang === 'en' ? 'Last updated:' : 'Última actualización:'} ${new Date(repo.updated_at).toLocaleDateString(document.documentElement.lang === 'en' ? 'en-US' : 'es-ES')}</p>
       </section>
       <div class="detail-actions">
-        ${safeRepo ? `<a class="btn-card-action btn-card-primary" href="${escapeHTML(safeRepo)}" target="_blank" rel="noopener noreferrer"><i class="fa-brands fa-github"></i> Ver código</a>` : ''}
-        ${safeDemo && repo.demoStatus === 'live' ? `<a class="btn-card-action btn-card-secondary" href="${escapeHTML(safeDemo)}" target="_blank" rel="noopener noreferrer"><i class="fa-solid fa-arrow-up-right-from-square"></i> Abrir demo</a>` : ''}
+        ${safeRepo ? `<a class="btn-card-action btn-card-primary" href="${escapeHTML(safeRepo)}" target="_blank" rel="noopener noreferrer"><i class="fa-brands fa-github"></i > ${escapeHTML(ui('code'))}</a>` : ''}
+        ${safeDemo && repo.demoStatus === 'live' ? `<a class="btn-card-action btn-card-secondary" href="${escapeHTML(safeDemo)}" target="_blank" rel="noopener noreferrer"><i class="fa-solid fa-arrow-up-right-from-square"></i > ${escapeHTML(ui('demo'))}</a>` : ''}
       </div>
     </article>`;
   if (projects) projects.hidden = true;
