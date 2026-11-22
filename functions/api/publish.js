@@ -69,7 +69,7 @@ export async function onRequestPost({ request, env }) {
   let input;
   try { input = await request.json(); } catch { return json({ error: "JSON no válido." }, 400); }
   if (typeof input.headline !== "string" || typeof input.bio !== "string" ||
-      !Array.isArray(input.timeline) || input.timeline.length > 100) {
+      !Array.isArray(input.timeline) || input.timeline.length > 100 || (input.clearTimeline !== undefined && typeof input.clearTimeline !== 'boolean')) {
     return json({ error: "Los datos del perfil o la trayectoria no tienen un formato válido." }, 400);
   }
   const requestedHeadline = input.headline.trim().slice(0, 120);
@@ -94,7 +94,7 @@ export async function onRequestPost({ request, env }) {
   // Empty form fields mean "not supplied", never "delete published content".
   const headline = requestedHeadline || String(currentDocument.profile?.headline || "").slice(0, 120);
   const bio = requestedBio || String(currentDocument.profile?.bio || "").slice(0, 600);
-  const branch = "admincenter/content-" + stamp;
+  const stamp = Date.now().toString(36);\n  const branch = "admincenter/content-" + stamp;
   const api = "/repos/" + owner + "/" + repo;
   try {
     const mainRef = await github(api + "/git/ref/heads/" + base, env.GITHUB_TOKEN);
@@ -114,7 +114,7 @@ export async function onRequestPost({ request, env }) {
       schemaVersion: 1,
       updatedAt: new Date().toISOString(),
       profile: { headline, bio },
-      timeline: timeline.length ? timeline : (Array.isArray(currentDocument.timeline) ? currentDocument.timeline : [])
+      timeline: input.clearTimeline === true ? [] : (timeline.length ? timeline : (Array.isArray(currentDocument.timeline) ? currentDocument.timeline : []))
     };
     await github(api + "/contents/" + path, env.GITHUB_TOKEN, {
       method: "PUT",
