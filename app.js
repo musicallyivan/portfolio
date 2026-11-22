@@ -995,6 +995,9 @@ function openProjectDetail(repoName, updateHistory = true) {
   const safeRepo = safeExternalUrl(repo.html_url, { githubOnly: true });
   const safeDemo = safeExternalUrl(repo.homepage);
   const screenshots = (repo.screenshots || []).map(safeExternalUrl).filter(Boolean);
+  const galleryHTML = screenshots.length
+    ? screenshots.map((src, index) => '<img src="' + escapeHTML(src) + '" alt="Captura ' + (index + 1) + ' de ' + escapeHTML(repo.title || repo.name) + '" loading="lazy">').join('')
+    : '<div class="detail-gallery-empty"><i class="fa-regular fa-images"></i><p>' + escapeHTML(ui('screenshotsSoon')) + '</p></div>';
   const title = escapeHTML(repo.title || repo.name);
   const description = escapeHTML(projectDescription(repo));
   const status = repo.demoStatus === 'live' && safeDemo ? ui('demoLive') : repo.demoStatus === 'development' ? ui('development') : ui('noDemo');
@@ -1013,7 +1016,7 @@ function openProjectDetail(repoName, updateHistory = true) {
       </header>
       <section class="detail-gallery" aria-label="Capturas del proyecto">
         <h2>Capturas del proyecto</h2>
-        ${screenshots.length ? screenshots.map((src,index) => `<img src="${escapeHTML(src)}" alt="Captura ${index+1} de ${title}" loading="lazy">`).join('') : '<div class="detail-gallery-empty"><i class="fa-regular fa-images"></i><p>${escapeHTML(ui('screenshotsSoon'))}</p></div>'}
+        ${galleryHTML}
       </section>
       <section class="detail-description">
         <h2>${escapeHTML(ui('aboutProject'))}</h2><p>${description}</p>
