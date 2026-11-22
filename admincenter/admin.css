@@ -34,3 +34,5 @@
 .language-control select{appearance:none;border:0;outline:0;background:transparent;color:var(--text);font:600 11px 'DM Sans',sans-serif;cursor:pointer;padding:3px 2px}
 .language-control option{background:#11182a;color:#f3f6ff}
 @media(max-width:640px){.language-control{padding:6px 8px}.top-actions{gap:8px}}
+
+.experience-form-actions,.experience-actions{display:flex;align-items:center;gap:9px;flex-wrap:wrap}.experience-actions{margin-top:7px}.experience-actions button{padding:6px 9px;border:1px solid var(--line);border-radius:7px}.experience-form-actions .secondary-btn[hidden]{display:none}
