@@ -1,0 +1,36 @@
+name: Validate portfolio
+
+on:
+  push:
+    branches:
+      - main
+      - feature/portfolio-phase-2
+  pull_request:
+    branches:
+      - main
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    name: JavaScript and content validation
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Check JavaScript syntax
+        run: |
+          node --check app.js
+          node --check phase2.js
+          node --check admincenter/admin.js
+          node --check functions/api/publish.js
+
+      - name: Validate published content JSON
+        run: node -e "JSON.parse(require('node:fs').readFileSync('content/site-content.json', 'utf8'))"
