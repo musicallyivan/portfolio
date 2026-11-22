@@ -27,3 +27,5 @@
   .notice-card h3 { font-size: 16px; }
   .notice-card p, .callout, .privacy-note { font-size: 11px; }
 }
+
+.publish-btn{white-space:nowrap;padding:10px 14px;font-size:10px}.publish-btn:disabled{opacity:.6;cursor:wait}@media(max-width:760px){.publish-btn{padding:9px 10px;font-size:9px}}
