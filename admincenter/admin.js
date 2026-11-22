@@ -22,7 +22,8 @@ const read=(key,def)=>{try{return JSON.parse(localStorage.getItem(key))??def}cat
 const getContent=()=>{const d=read(CONTENT_KEY,fallback);return{headline:String(d.headline||''),bio:String(d.bio||''),timeline:Array.isArray(d.timeline)?d.timeline:[]}};
 const saveContent=d=>localStorage.setItem(CONTENT_KEY,JSON.stringify(d));
 const CLEAR_TIMELINE_KEY='portfolio-phase2-clear-timeline-v1';
-let clearTimelineForPublish=read(CLEAR_TIMELINE_KEY,false)===true;\nconst setClearTimelineForPublish=value=>{clearTimelineForPublish=Boolean(value);localStorage.setItem(CLEAR_TIMELINE_KEY,JSON.stringify(clearTimelineForPublish));};
+let clearTimelineForPublish=read(CLEAR_TIMELINE_KEY,false)===true;
+const setClearTimelineForPublish=value=>{clearTimelineForPublish=Boolean(value);localStorage.setItem(CLEAR_TIMELINE_KEY,JSON.stringify(clearTimelineForPublish));};
 const $=id=>document.getElementById(id);
 const toast=message=>{const el=$('toast');el.textContent=message;el.classList.add('show');clearTimeout(toast.timer);toast.timer=setTimeout(()=>el.classList.remove('show'),2600)};
 const labels={overview:'navOverview',profile:'navProfile',experience:'navExperience',projects:'navProjects','data':'navData'};
