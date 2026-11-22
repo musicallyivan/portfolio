@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="robots" content="noindex,nofollow,noarchive">
+  <meta name="theme-color" content="#090d1b">
+  <title>Admin Center | Musically Ivan</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="./admin.css">
+  <script src="./admin.js" defer></script>
+</head>
+<body>
+  <div class="shell">
+    <aside class="sidebar" id="sidebar">
+      <a class="brand" href="./" aria-label="Admin Center"><span class="brand-mark">M</span><span><b>Musically Ivan</b><small>ADMIN CENTER</small></span></a>
+      <div class="workspace"><span class="workspace-icon">✦</span><span><b>Portfolio</b><small>Workspace personal</small></span><span class="online-dot"></span></div>
+      <p class="nav-label">GENERAL</p>
+      <nav class="nav">
+        <a class="nav-link active" href="#overview" data-view="overview"><span>▦</span>Resumen</a>
+        <a class="nav-link" href="#profile" data-view="profile"><span>◎</span>Perfil</a>
+        <a class="nav-link" href="#experience" data-view="experience"><span>⌁</span>Experiencia</a>
+        <a class="nav-link" href="#projects" data-view="projects"><span>▧</span>Proyectos</a>
+        <a class="nav-link" href="#data" data-view="data"><span>⇄</span>Datos y copias</a>
+      </nav>
+      <div class="sidebar-bottom"><div class="secure-pill"><span>◆</span><div><b>Acceso protegido</b><small>Identidad gestionada por Cloudflare</small></div></div><a class="back-link" href="/">← Volver al portfolio</a></div>
+    </aside>
+    <main class="main">
+      <header class="topbar"><button class="mobile-menu" id="menu-toggle" aria-label="Abrir menú">☰</button><div class="breadcrumbs">Workspace <span>/</span> <b id="crumb">Resumen</b></div><div class="top-actions"><span class="status"><i></i> Panel listo</span><div class="avatar">MI</div></div></header>
+      <div class="content">
+        <section class="view active" id="view-overview">
+          <div class="page-heading"><div><p class="eyebrow">TU ESPACIO DE TRABAJO</p><h1>Resumen general<span class="accent">.</span></h1><p class="subheading">Gestiona tu presencia digital desde un solo lugar.</p></div><span class="date-chip" id="today"></span></div>
+          <div class="welcome-card"><div><span class="welcome-kicker">ADMIN CENTER · 01</span><h2>¡Hola, Ivan! 👋</h2><p>Este es el centro de control de tu portfolio. Aquí puedes preparar y organizar el contenido de tu perfil.</p><a class="primary-btn" href="#profile" data-go="profile">Editar mi perfil <span>→</span></a></div><div class="welcome-art"><div class="orbit orbit-one"></div><div class="orbit orbit-two"></div><div class="art-core">M<span>✦</span></div></div></div>
+          <div class="section-title"><div><h2>Estado del portfolio</h2><p>Indicadores guardados en este navegador.</p></div><span class="live-label"><i></i> LOCAL</span></div>
+          <div class="stats-grid"><article class="stat-card"><span class="stat-icon purple">◷</span><small>Visitas locales</small><strong id="metric-views">0</strong><em>En este navegador</em></article><article class="stat-card"><span class="stat-icon blue">▤</span><small>Días activos</small><strong id="metric-days">0</strong><em>Actividad local</em></article><article class="stat-card"><span class="stat-icon green">⌁</span><small>Experiencias</small><strong id="metric-timeline">0</strong><em>Elementos de tu perfil</em></article><article class="stat-card"><span class="stat-icon amber">◈</span><small>Estado</small><strong class="state-text">Preparado</strong><em>Edición local</em></article></div>
+          <div class="bottom-grid"><article class="panel-card"><div class="panel-heading"><div><h3>Accesos rápidos</h3><p>Continúa donde lo dejaste.</p></div></div><button class="quick-row" data-go="profile"><span class="quick-icon">◎</span><span><b>Actualizar presentación</b><small>Tu titular y biografía</small></span><span>→</span></button><button class="quick-row" data-go="experience"><span class="quick-icon">⌁</span><span><b>Gestionar experiencia</b><small>Formación y trayectoria</small></span><span>→</span></button><button class="quick-row" data-go="data"><span class="quick-icon">⇄</span><span><b>Crear copia de seguridad</b><small>Exportar tus datos JSON</small></span><span>→</span></button></article><article class="panel-card notice-card"><span class="notice-icon">ⓘ</span><h3>Cómo se guardan los cambios</h3><p>Los cambios se guardan en el almacenamiento local de este navegador. No se publican automáticamente en la web ni modifican GitHub.</p><p class="notice-foot">Para publicar contenido necesitaremos conectar después un backend seguro o un flujo de publicación autenticado.</p></article></div>
+        </section>
+        <section class="view" id="view-profile">
+          <div class="page-heading"><div><p class="eyebrow">IDENTIDAD</p><h1>Tu perfil<span class="accent">.</span></h1><p class="subheading">Define cómo te presentas en tu portfolio.</p></div></div>
+          <article class="panel-card form-card"><div class="panel-heading"><div><h3>Presentación profesional</h3><p>Los borradores se guardan en este navegador.</p></div><span class="edit-badge">EDITABLE</span></div><label for="headline">Titular profesional</label><input id="headline" maxlength="120" placeholder="Ej. Desarrollador de software y creador digital"><div class="field-meta"><span>Una frase que te represente.</span><span id="headline-count">0/120</span></div><label for="bio">Biografía</label><textarea id="bio" rows="6" maxlength="600" placeholder="Cuéntale al mundo quién eres, qué haces y qué te interesa..."></textarea><div class="field-meta"><span>Hasta 600 caracteres.</span><span id="bio-count">0/600</span></div><div class="form-actions"><span id="profile-status" class="save-status" aria-live="polite"></span><button class="primary-btn" id="save-profile">Guardar cambios <span>→</span></button></div></article>
+        </section>
+        <section class="view" id="view-experience">
+          <div class="page-heading"><div><p class="eyebrow">TRAYECTORIA</p><h1>Experiencia<span class="accent">.</span></h1><p class="subheading">Organiza tu formación, proyectos y experiencia.</p></div></div>
+          <div class="experience-layout"><article class="panel-card"><div class="panel-heading"><div><h3>Añadir elemento</h3><p>Completa los datos de una etapa.</p></div></div><form id="experience-form"><label for="exp-title">Título</label><input id="exp-title" required maxlength="100" placeholder="Ej. Sistemas Microinformáticos y Redes"><label for="exp-period">Periodo</label><input id="exp-period" maxlength="60" placeholder="Ej. 2025 – 2027"><label for="exp-description">Descripción</label><textarea id="exp-description" rows="4" maxlength="400" placeholder="Describe brevemente esta etapa..."></textarea><button class="primary-btn" type="submit">Añadir a la trayectoria <span>+</span></button></form></article><article class="panel-card"><div class="panel-heading"><div><h3>Tu trayectoria</h3><p id="experience-count">0 elementos</p></div></div><div id="experience-list" class="experience-list"></div></article></div>
+        </section>
+        <section class="view" id="view-projects">
+          <div class="page-heading"><div><p class="eyebrow">PORTFOLIO</p><h1>Proyectos<span class="accent">.</span></h1><p class="subheading">Vista del catálogo conectado a GitHub.</p></div></div>
+          <article class="panel-card"><div class="panel-heading"><div><h3>Sincronización de proyectos</h3><p>El catálogo público se alimenta desde el repositorio.</p></div><span class="source-badge">GITHUB</span></div><div class="project-info"><span class="project-glyph">⌘</span><div><b>Repositorio musicallyivan/portfolio</b><p>Los datos y metadatos de los proyectos se mantienen en <code>app.js</code>. Este panel no modifica el repositorio ni publica cambios.</p><a href="https://github.com/musicallyivan/portfolio" target="_blank" rel="noopener noreferrer">Abrir repositorio ↗</a></div></div><div class="callout">La edición y publicación de proyectos desde este panel se habilitará cuando conectemos un servicio backend con permisos limitados y autenticación.</div></article>
+        </section>
+        <section class="view" id="view-data">
+          <div class="page-heading"><div><p class="eyebrow">PORTABILIDAD</p><h1>Datos y copias<span class="accent">.</span></h1><p class="subheading">Controla tus datos locales y conserva una copia.</p></div></div>
+          <div class="data-grid"><article class="panel-card"><span class="data-icon">⇧</span><h3>Exportar datos</h3><p>Descarga tu perfil y trayectoria en un archivo JSON para conservarlo o trasladarlo.</p><button class="primary-btn" id="export-data">Exportar copia <span>↓</span></button></article><article class="panel-card"><span class="data-icon">⇩</span><h3>Importar datos</h3><p>Restaura una copia JSON creada anteriormente desde este panel.</p><label class="secondary-btn file-button" for="import-data">Seleccionar archivo</label><input id="import-data" type="file" accept="application/json" hidden></article></div><p class="privacy-note">Privacidad: los datos se almacenan en el navegador que estás utilizando. Exporta una copia antes de borrar los datos del navegador o cambiar de dispositivo.</p>
+        </section>
+        <footer class="footer"><span>© 2026 Musically Ivan · Admin Center</span><span>Hecho para gestionar tu portfolio.</span></footer>
+      </div>
+    </main>
+  </div>
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+</body>
+</html>
