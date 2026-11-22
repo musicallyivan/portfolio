@@ -114,7 +114,7 @@ export async function onRequestPost({ request, env }) {
       schemaVersion: 1,
       updatedAt: new Date().toISOString(),
       profile: { headline, bio },
-      timeline
+      timeline: timeline.length ? timeline : (Array.isArray(currentDocument.timeline) ? currentDocument.timeline : [])
     };
     await github(api + "/contents/" + path, env.GITHUB_TOKEN, {
       method: "PUT",
