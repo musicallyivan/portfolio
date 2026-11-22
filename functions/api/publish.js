@@ -94,7 +94,8 @@ export async function onRequestPost({ request, env }) {
   // Empty form fields mean "not supplied", never "delete published content".
   const headline = requestedHeadline || String(currentDocument.profile?.headline || "").slice(0, 120);
   const bio = requestedBio || String(currentDocument.profile?.bio || "").slice(0, 600);
-  const stamp = Date.now().toString(36);\n  const branch = "admincenter/content-" + stamp;
+  const stamp = Date.now().toString(36);
+  const branch = "admincenter/content-" + stamp;
   const api = "/repos/" + owner + "/" + repo;
   try {
     const mainRef = await github(api + "/git/ref/heads/" + base, env.GITHUB_TOKEN);
