@@ -8,6 +8,7 @@
 // 1. REPOSITORIES DATABASE & CURATED METADATA
 // ==========================================================================
 const GITHUB_USERNAME = 'musicallyivan';
+const PORTFOLIO_UI={es:{all:'Todos',featured:'Destacados',demos:'Demos',applications:'Aplicaciones',shown:(n,t)=>'Mostrando '+n+' de '+t+' proyectos',emptyTitle:'No se encontraron proyectos',emptyDesc:'Intenta buscar con otros términos o limpia los filtros activos.',reset:'Restablecer filtros',demoLive:'Demo disponible',development:'En desarrollo',noDemo:'Sin demo',public:'Público',details:'Detalles',demo:'Demo',code:'Código',dark:'Modo Oscuro activado',light:'Modo Claro activado',syncDone:'Repositorios sincronizados con GitHub',syncCache:'Mostrando versión optimizada en caché',cloneInvalid:'URL de repositorio no válida',clipboardUnavailable:'El portapapeles no está disponible en este navegador',cloneCopied:'Comando git clone copiado',copyError:'Error al copiar al portapapeles'},en:{all:'All',featured:'Featured',demos:'Demos',applications:'Applications',shown:(n,t)=>'Showing '+n+' of '+t+' projects',emptyTitle:'No projects found',emptyDesc:'Try different search terms or clear the active filters.',reset:'Reset filters',demoLive:'Demo available',development:'In development',noDemo:'No demo',public:'Public',details:'Details',demo:'Demo',code:'Code',dark:'Dark mode enabled',light:'Light mode enabled',syncDone:'Repositories synced with GitHub',syncCache:'Showing optimized cached version',cloneInvalid:'Invalid repository URL',clipboardUnavailable:'Clipboard is unavailable in this browser',cloneCopied:'Git clone command copied',copyError:'Could not copy to clipboard'}};\nfunction ui(k){return (PORTFOLIO_UI[document.documentElement.lang==='en'?'en':'es'][k]||PORTFOLIO_UI.es[k]||k)}\nwindow.addEventListener('portfolio:languagechange',()=>{renderFilterChips();renderProjects()});\n
 
 // Detailed data for all repositories with rich descriptions and live URLs
 const CURATED_REPOS = [
@@ -545,7 +546,7 @@ async function fetchGitHubRepos(forceNotify = false) {
       }
 
       if (forceNotify) {
-        showToast('Repositorios sincronizados con GitHub', 'fa-github');
+        showToast(ui('syncDone'), 'fa-github');
       }
     }
   } catch (error) {
@@ -556,7 +557,7 @@ async function fetchGitHubRepos(forceNotify = false) {
     renderProjects();
 
     if (forceNotify) {
-      showToast('Mostrando versión optimizada en caché', 'fa-database');
+      showToast(ui('syncCache'), 'fa-database');
     }
   } finally {
     if (syncBtn) syncBtn.classList.remove('loading');
@@ -628,9 +629,9 @@ function renderFilterChips() {
   if (!container) return;
 
   const filters = [
-    { id: 'all', label: 'Todos', icon: 'fa-globe', count: state.repos.length },
-    { id: 'featured', label: 'Destacados', icon: 'fa-star', count: state.repos.filter(r => r.featured).length },
-    { id: 'demos', label: 'Demos', icon: 'fa-circle-play', count: state.repos.filter(r => r.demoStatus === 'live' && r.homepage).length }
+    { id: 'all', label: ui('all'), icon: 'fa-globe', count: state.repos.length },
+    { id: 'featured', label: ui('featured'), icon: 'fa-star', count: state.repos.filter(r => r.featured).length },
+    { id: 'demos', label: ui('demos'), icon: 'fa-circle-play', count: state.repos.filter(r => r.demoStatus === 'live' && r.homepage).length }
   ];
   const languages = [...new Set(state.repos.map(r => r.language || 'Otros'))].sort();
   const categories = [...new Set(state.repos.map(r => r.category || 'Aplicaciones'))].sort();
@@ -709,15 +710,15 @@ function renderProjects() {
 
   // Update counter
   if (countEl) {
-    countEl.textContent = `Mostrando ${filtered.length} de ${state.repos.length} proyectos`;
+    countEl.textContent = ui('shown')(filtered.length,state.repos.length);
   }
 
   if (filtered.length === 0) {
     grid.innerHTML = `
       <div class="empty-state">
         <i class="fa-solid fa-compass-slash empty-icon"></i>
-        <h3 class="empty-title">No se encontraron proyectos</h3>
-        <p class="empty-desc">Intenta buscar con otros términos o limpia los filtros activos.</p>
+        <h3 class="empty-title">${escapeHTML(ui('emptyTitle'))}</h3>
+        <p class="empty-desc">${escapeHTML(ui('emptyDesc'))}</p>
         <button id="btn-reset-search-filters" type="button" class="btn-card-action btn-card-primary empty-reset-button">
           <i class="fa-solid fa-rotate-left" aria-hidden="true"></i> Restablecer filtros
         </button>
@@ -760,7 +761,7 @@ function renderProjects() {
             <div class="card-badges">
               ${isLive ? `<span class="badge-live-demo"><i class="fa-solid fa-bolt"></i> Demo disponible</span>` : `<span class="badge-demo-status status-${escapeHTML(repo.demoStatus)}">${escapeHTML(statusLabel)}</span>`}
               ${repo.featured ? '<span class="badge-featured"><i class="fa-solid fa-star"></i> Destacado</span>' : ''}
-              <span class="badge-public">Público</span>
+              <span class="badge-public">${escapeHTML(ui('public'))}</span>
             </div>
           </div>
 
@@ -904,7 +905,7 @@ window.copyCloneUrl = function(repoUrl) {
     return;
   }
   navigator.clipboard.writeText(cloneCmd).then(() => {
-    showToast('Comando git clone copiado', 'fa-clipboard-check');
+    showToast(ui('cloneCopied'), 'fa-clipboard-check');
   }).catch(() => {
     showToast('Error al copiar al portapapeles', 'fa-circle-xmark');
   });
