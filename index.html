@@ -45,30 +45,30 @@
     <div class="welcome-glass-card">
       <div class="welcome-badge">
         <i class="fa-solid fa-sparkles"></i>
-        <span>PORTAFOLIO & REPOSITORIOS</span>
+        <span data-i18n="welcomeBadge">PORTAFOLIO & REPOSITORIOS</span>
       </div>
-      <h1 class="welcome-title">Bienvenidos/as a mis proyectos</h1>
+      <h1 class="welcome-title" data-i18n="welcomeTitle">Bienvenidos/as a mis proyectos</h1>
       <p class="welcome-subtitle">
-        Sumérgete en mi colección de software, aplicaciones interactivas, herramientas de automatización y proyectos de código abierto.
+        <span data-i18n="welcomeSubtitle">Sumérgete en mi colección de software, aplicaciones interactivas, herramientas de automatización y proyectos de código abierto.</span>
       </p>
       
       <div class="welcome-highlights">
         <div class="welcome-pill">
           <i class="fa-solid fa-wand-magic-sparkles"></i>
-          <span>Glassmorphism 2.0</span>
+          <span data-i18n="welcomePill1">Glassmorphism 2.0</span>
         </div>
         <div class="welcome-pill">
           <i class="fa-solid fa-bolt"></i>
-          <span>Demos en Vivo</span>
+          <span data-i18n="welcomePill2">Demos en Vivo</span>
         </div>
         <div class="welcome-pill">
           <i class="fa-brands fa-github"></i>
-          <span>100% Código Abierto</span>
+          <span data-i18n="welcomePill3">100% Código Abierto</span>
         </div>
       </div>
 
       <button id="btn-welcome-continue" class="btn-welcome-continue" type="button" aria-label="Entrar al portafolio">
-        <span>Continuar</span>
+        <span data-i18n="continue">Continuar</span>
         <i class="fa-solid fa-arrow-right"></i>
       </button>
     </div>
@@ -103,9 +103,9 @@
 
         <!-- Desktop Nav Links -->
         <ul class="nav-links">
-          <li><a href="#hero" class="nav-link active"><i class="fa-solid fa-house"></i> <span>Inicio</span></a></li>
-          <li><a href="#projects" class="nav-link"><i class="fa-solid fa-layer-group"></i> <span>Proyectos</span></a></li>
-          <li><a href="#contact" class="nav-link"><i class="fa-solid fa-paper-plane"></i> <span>Formulario</span></a></li>
+          <li><a href="#hero" class="nav-link active"><i class="fa-solid fa-house"></i> <span data-i18n="navHome">Inicio</span></a></li>
+          <li><a href="#projects" class="nav-link"><i class="fa-solid fa-layer-group"></i> <span data-i18n="navProjects">Proyectos</span></a></li>
+          <li><a href="#contact" class="nav-link"><i class="fa-solid fa-paper-plane"></i> <span data-i18n="navContactShort">Formulario</span></a></li>
         </ul>
 
         <!-- Nav Actions (Theme Toggle, GitHub & Mobile Menu Toggle) -->
@@ -142,15 +142,15 @@
         </div>
 
         <ul class="mobile-drawer-links">
-          <li><a href="#hero" class="mobile-nav-item active"><i class="fa-solid fa-house"></i> <span>Inicio</span></a></li>
-          <li><a href="#projects" class="mobile-nav-item"><i class="fa-solid fa-layer-group"></i> <span>Proyectos</span></a></li>
-          <li><a href="#contact" class="mobile-nav-item"><i class="fa-solid fa-paper-plane"></i> <span>Formulario de Contacto</span></a></li>
+          <li><a href="#hero" class="mobile-nav-item active"><i class="fa-solid fa-house"></i> <span data-i18n="navHome">Inicio</span></a></li>
+          <li><a href="#projects" class="mobile-nav-item"><i class="fa-solid fa-layer-group"></i> <span data-i18n="navProjects">Proyectos</span></a></li>
+          <li><a href="#contact" class="mobile-nav-item"><i class="fa-solid fa-paper-plane"></i> <span data-i18n="navContact">Formulario de Contacto</span></a></li>
         </ul>
 
         <div class="mobile-drawer-footer">
           <label class="sr-only" for="mobile-language-switcher">Language</label><select id="mobile-language-switcher" class="language-switcher" aria-label="Language"><option value="es">Español</option><option value="en">English</option></select>
           <a href="https://github.com/musicallyivan" target="_blank" rel="noopener noreferrer" class="btn-card-action btn-card-primary mobile-github-link">
-            <i class="fa-brands fa-github"></i> <span>Ver en GitHub</span>
+            <i class="fa-brands fa-github"></i> <span data-i18n="viewGithub">Ver en GitHub</span>
           </a>
         </div>
       </div>
@@ -160,38 +160,38 @@
     <section id="hero" class="hero-section">
       <div class="hero-main-card">
         <div class="hero-badge-tag">
-          <i class="fa-solid fa-code"></i> DESARROLLADOR FULLSTACK & SOFTWARE
+          <i class="fa-solid fa-code"></i> <span data-i18n="heroBadge">DESARROLLADOR FULLSTACK & SOFTWARE</span>
         </div>
         
         <h1 class="hero-title">
-          Mis Creaciones & <span class="gradient-text">Repositorios</span>
+          <span data-i18n="heroTitle">Mis Creaciones &</span> <span class="gradient-text" data-i18n="heroTitleAccent">Repositorios</span>
         </h1>
         
         <p class="hero-desc">
-          Explora mis aplicaciones interactivas, convertidores multimedia, rastreadores temáticos, bibliotecas y herramientas de código abierto organizadas con diseño moderno y soporte para demos en vivo.
+          <span data-i18n="heroDescription">Explora mis aplicaciones interactivas, convertidores multimedia, rastreadores temáticos, bibliotecas y herramientas de código abierto organizadas con diseño moderno y soporte para demos en vivo.</span>
         </p>
 
         <!-- Stats Counter Row -->
         <div class="stats-grid">
           <div class="stat-card">
             <div id="stat-total-repos" class="stat-number">0</div>
-            <div class="stat-label">Repositorios</div>
+            <div class="stat-label" data-i18n="statRepos">Repositorios</div>
           </div>
           <div class="stat-card">
             <div id="stat-total-languages" class="stat-number">0</div>
-            <div class="stat-label">Tecnologías</div>
+            <div class="stat-label" data-i18n="statTech">Tecnologías</div>
           </div>
           <div class="stat-card">
             <div id="stat-total-demos" class="stat-number">0</div>
-            <div class="stat-label">Demos configuradas</div>
+            <div class="stat-label" data-i18n="statDemos">Demos configuradas</div>
           </div>
           <div class="stat-card">
             <div id="stat-total-stars" class="stat-number">0</div>
-            <div class="stat-label">Estrellas GitHub</div>
+            <div class="stat-label" data-i18n="statStars">Estrellas GitHub</div>
           </div>
           <div class="stat-card">
             <div id="stat-total-followers" class="stat-number">0</div>
-            <div class="stat-label">Seguidores</div>
+            <div class="stat-label" data-i18n="statFollowers">Seguidores</div>
           </div>
         </div>
       </div>
@@ -207,26 +207,26 @@
               type="text" 
               id="search-input" 
               class="search-input" 
-              placeholder="Buscar por nombre, tecnología o descripción..." 
+              data-i18n-placeholder="searchPlaceholder" placeholder="Buscar por nombre, tecnología o descripción..." 
               autocomplete="off"
-              aria-label="Buscar proyectos"
+              data-i18n-aria="searchAria" aria-label="Buscar proyectos"
             />
             <i class="fa-solid fa-magnifying-glass search-icon" aria-hidden="true"></i>
-            <button id="btn-clear-search" class="btn-clear-search" title="Limpiar búsqueda" aria-label="Limpiar búsqueda">
+            <button id="btn-clear-search" class="btn-clear-search" data-i18n-title="clearSearch" data-i18n-aria="clearSearch" title="Limpiar búsqueda" aria-label="Limpiar búsqueda">
               <i class="fa-solid fa-xmark"></i>
             </button>
           </div>
 
           <div class="controls-aux">
             <select id="sort-select" class="custom-select" aria-label="Ordenar repositorios">
-              <option value="recent">🕒 Más recientes</option>
-              <option value="name">🔤 Nombre (A - Z)</option>
-              <option value="stars">⭐ Más estrellas</option>
+              <option value="recent" data-i18n="sortRecent">🕒 Más recientes</option>
+              <option value="name" data-i18n="sortName">🔤 Nombre (A - Z)</option>
+              <option value="stars" data-i18n="sortStars">⭐ Más estrellas</option>
             </select>
 
             <button id="btn-sync-github" class="btn-sync-github" title="Sincronizar repositorios en tiempo real" aria-label="Sincronizar con GitHub">
               <i class="fa-solid fa-arrows-rotate"></i>
-              <span>Sincronizar</span>
+              <span data-i18n="sync">Sincronizar</span>
             </button>
           </div>
         </div>
@@ -246,9 +246,9 @@
       <div class="section-header">
         <div class="section-title-wrap">
           <span class="section-badge"><i class="fa-solid fa-grid-2"></i> CATÁLOGO COMPLETO</span>
-          <h2 class="section-title">Galería de Repositorios</h2>
+          <h2 class="section-title" data-i18n="catalogTitle">Galería de Repositorios</h2>
         </div>
-        <div id="filtered-count" class="results-info">Cargando proyectos...</div>
+        <div id="filtered-count" class="results-info" data-i18n="loadingProjects">Cargando proyectos...</div>
       </div>
 
       <!-- Grid Container -->
@@ -281,9 +281,9 @@
           <div class="hero-badge-tag">
             <i class="fa-solid fa-envelope"></i> CONTACTO & FEEDBACK
           </div>
-          <h2 class="contact-title">¿Tienes un proyecto en mente?</h2>
+          <h2 class="contact-title" data-i18n="contactTitle">¿Tienes un proyecto en mente?</h2>
           <p class="contact-desc">
-            Envíame tus dudas, propuestas de colaboración o sugerencias a través del siguiente formulario interactivo de Google Forms.
+            <span data-i18n="contactDescription">Envíame tus dudas, propuestas de colaboración o sugerencias a través del siguiente formulario interactivo de Google Forms.</span>
           </p>
         </div>
 
@@ -300,7 +300,7 @@
         </div>
         <a class="form-open-link" href="https://docs.google.com/forms/d/e/1FAIpQLSfbEAZamu1cThf0AtbwNP9W-S1jnlK6qULG6VwN3nPm2Ln3NA/viewform" target="_blank" rel="noopener noreferrer">
           <i class="fa-solid fa-arrow-up-right-from-square" aria-hidden="true"></i>
-          Abrir formulario en otra pestaña
+          <span data-i18n="openForm">Abrir formulario en otra pestaña</span>
         </a>
       </div>
     </section>
@@ -310,7 +310,7 @@
       <div class="footer-glass">
         <div class="footer-brand">
           <div class="footer-brand-title">Ivan • musicallyivan</div>
-          <p class="footer-copy">© 2026 Diseñado con estilo Glassmorphism y animaciones modernas. Totalmente responsivo.</p>
+          <p class="footer-copy" data-i18n="footerCopy">© 2026 Diseñado con estilo Glassmorphism y animaciones modernas. Totalmente responsivo.</p>
         </div>
 
         <div class="footer-socials">
