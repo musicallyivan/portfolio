@@ -758,7 +758,7 @@ function renderProjects() {
               <i class="${icon}" aria-hidden="true"></i>
             </div>
             <div class="card-badges">
-              ${isLive ? `<span class="badge-live-demo"><i class="fa-solid fa-bolt"></i> Demo Online</span>` : `<span class="badge-demo-status status-${escapeHTML(repo.demoStatus)}">${escapeHTML(statusLabel)}</span>`}
+              ${isLive ? `<span class="badge-live-demo"><i class="fa-solid fa-bolt"></i> Demo disponible</span>` : `<span class="badge-demo-status status-${escapeHTML(repo.demoStatus)}">${escapeHTML(statusLabel)}</span>`}
               ${repo.featured ? '<span class="badge-featured"><i class="fa-solid fa-star"></i> Destacado</span>' : ''}
               <span class="badge-public">Público</span>
             </div>
