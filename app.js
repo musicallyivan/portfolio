@@ -8,7 +8,8 @@
 // 1. REPOSITORIES DATABASE & CURATED METADATA
 // ==========================================================================
 const GITHUB_USERNAME = 'musicallyivan';
-const PORTFOLIO_UI={es:{all:'Todos',featured:'Destacados',demos:'Demos',applications:'Aplicaciones',shown:(n,t)=>'Mostrando '+n+' de '+t+' proyectos',emptyTitle:'No se encontraron proyectos',emptyDesc:'Intenta buscar con otros términos o limpia los filtros activos.',reset:'Restablecer filtros',demoLive:'Demo disponible',development:'En desarrollo',noDemo:'Sin demo',public:'Público',details:'Detalles',demo:'Demo',code:'Código',dark:'Modo Oscuro activado',light:'Modo Claro activado',syncDone:'Repositorios sincronizados con GitHub',syncCache:'Mostrando versión optimizada en caché',cloneInvalid:'URL de repositorio no válida',clipboardUnavailable:'El portapapeles no está disponible en este navegador',cloneCopied:'Comando git clone copiado',copyError:'Error al copiar al portapapeles'},en:{all:'All',featured:'Featured',demos:'Demos',applications:'Applications',shown:(n,t)=>'Showing '+n+' of '+t+' projects',emptyTitle:'No projects found',emptyDesc:'Try different search terms or clear the active filters.',reset:'Reset filters',demoLive:'Demo available',development:'In development',noDemo:'No demo',public:'Public',details:'Details',demo:'Demo',code:'Code',dark:'Dark mode enabled',light:'Light mode enabled',syncDone:'Repositories synced with GitHub',syncCache:'Showing optimized cached version',cloneInvalid:'Invalid repository URL',clipboardUnavailable:'Clipboard is unavailable in this browser',cloneCopied:'Git clone command copied',copyError:'Could not copy to clipboard'}};\nfunction ui(k){return (PORTFOLIO_UI[document.documentElement.lang==='en'?'en':'es'][k]||PORTFOLIO_UI.es[k]||k)}\nwindow.addEventListener('portfolio:languagechange',()=>{renderFilterChips();renderProjects()});\n
+const PORTFOLIO_UI={es:{all:'Todos',featured:'Destacados',demos:'Demos',applications:'Aplicaciones',shown:(n,t)=>'Mostrando '+n+' de '+t+' proyectos',emptyTitle:'No se encontraron proyectos',emptyDesc:'Intenta buscar con otros términos o limpia los filtros activos.',reset:'Restablecer filtros',demoLive:'Demo disponible',development:'En desarrollo',noDemo:'Sin demo',public:'Público',details:'Detalles',demo:'Demo',code:'Código',dark:'Modo Oscuro activado',light:'Modo Claro activado',syncDone:'Repositorios sincronizados con GitHub',syncCache:'Mostrando versión optimizada en caché',cloneInvalid:'URL de repositorio no válida',clipboardUnavailable:'El portapapeles no está disponible en este navegador',cloneCopied:'Comando git clone copiado',copyError:'Error al copiar al portapapeles'},en:{all:'All',featured:'Featured',demos:'Demos',applications:'Applications',shown:(n,t)=>'Showing '+n+' of '+t+' projects',emptyTitle:'No projects found',emptyDesc:'Try different search terms or clear the active filters.',reset:'Reset filters',demoLive:'Demo available',development:'In development',noDemo:'No demo',public:'Public',details:'Details',demo:'Demo',code:'Code',dark:'Dark mode enabled',light:'Light mode enabled',syncDone:'Repositories synced with GitHub',syncCache:'Showing optimized cached version',cloneInvalid:'Invalid repository URL',clipboardUnavailable:'Clipboard is unavailable in this browser',cloneCopied:'Git clone command copied',copyError:'Could not copy to clipboard'}};\nfunction ui(k){return (PORTFOLIO_UI[document.documentElement.lang==='en'?'en':'es'][k]||PORTFOLIO_UI.es[k]||k)}
+function categoryName(v){const map={Aplicaciones:'applications'};return map[v]?ui(map[v]):v}\nwindow.addEventListener('portfolio:languagechange',()=>{renderFilterChips();renderProjects()});\n
 
 // Detailed data for all repositories with rich descriptions and live URLs
 const CURATED_REPOS = [
@@ -649,7 +650,7 @@ function renderFilterChips() {
     <button type="button" class="filter-chip ${state.activeFilter === f.id ? 'active' : ''}"
       data-filter="${escapeHTML(f.id)}" aria-pressed="${state.activeFilter === f.id}">
       <i class="fa-solid ${escapeHTML(f.icon)}" aria-hidden="true"></i>
-      <span>${escapeHTML(f.label)}</span><span class="chip-count">${f.count}</span>
+      <span>${escapeHTML(f.id.startsWith('category:') ? categoryName(f.label) : f.label)}</span><span class="chip-count">${f.count}</span>
     </button>
   `).join('');
 
@@ -739,14 +740,14 @@ function renderProjects() {
       .filter(topic => typeof topic === 'string')
       .slice(0, 3);
     const langClass = LANGUAGE_CLASSES[repo.language] || LANGUAGE_CLASSES['Default'];
-    const formattedDate = new Date(repo.updated_at).toLocaleDateString('es-ES', {
+    const formattedDate = new Date(repo.updated_at).toLocaleDateString(document.documentElement.lang === 'en' ? 'en-US' : 'es-ES', {
       year: 'numeric',
       month: 'short',
       day: 'numeric'
     });
 
     const isLive = Boolean(demoUrl) && repo.demoStatus === 'live';
-    const statusLabel = repo.demoStatus === 'live' ? 'Demo disponible' : repo.demoStatus === 'development' ? 'En desarrollo' : 'Sin demo';
+    const statusLabel = repo.demoStatus === 'live' ? ui('demoLive') : repo.demoStatus === 'development' ? ui('development') : ui('noDemo');
 
     return `
       <article class="repo-card">
@@ -759,8 +760,8 @@ function renderProjects() {
               <i class="${icon}" aria-hidden="true"></i>
             </div>
             <div class="card-badges">
-              ${isLive ? `<span class="badge-live-demo"><i class="fa-solid fa-bolt"></i> Demo disponible</span>` : `<span class="badge-demo-status status-${escapeHTML(repo.demoStatus)}">${escapeHTML(statusLabel)}</span>`}
-              ${repo.featured ? '<span class="badge-featured"><i class="fa-solid fa-star"></i> Destacado</span>' : ''}
+              ${isLive ? `<span class="badge-live-demo"><i class="fa-solid fa-bolt"></i> ${escapeHTML(ui('demoLive'))}</span>` : `<span class="badge-demo-status status-${escapeHTML(repo.demoStatus)}">${escapeHTML(statusLabel)}</span>`}
+              ${repo.featured ? `<span class="badge-featured"><i class="fa-solid fa-star"></i> ${escapeHTML(ui('featured'))}</span>` : ''}
               <span class="badge-public">${escapeHTML(ui('public'))}</span>
             </div>
           </div>
@@ -785,14 +786,14 @@ function renderProjects() {
           <!-- Card Stats Footer -->
           <div class="card-meta">
             <div class="meta-stats">
-              <span class="meta-stat" title="Estrellas">
+              <span class="meta-stat" title="${document.documentElement.lang === 'en' ? 'Stars' : 'Estrellas'}">
                 <i class="fa-solid fa-star"></i> ${repo.stars || 0}
               </span>
               <span class="meta-stat" title="Forks">
                 <i class="fa-solid fa-code-fork"></i> ${repo.forks || 0}
               </span>
             </div>
-            <span class="meta-date" title="Última actualización">
+            <span class="meta-date" title="${document.documentElement.lang === 'en' ? 'Last updated' : 'Última actualización'}">
               <i class="fa-regular fa-clock"></i> ${formattedDate}
             </span>
           </div>
@@ -972,12 +973,12 @@ function openProjectDetail(repoName, updateHistory = true) {
   const safeDemo = safeExternalUrl(repo.homepage);
   const screenshots = (repo.screenshots || []).map(safeExternalUrl).filter(Boolean);
   const title = escapeHTML(repo.title || repo.name);
-  const description = escapeHTML(repo.description || 'Proyecto de código abierto.');
-  const status = repo.demoStatus === 'live' && safeDemo ? 'Demo disponible' : repo.demoStatus === 'development' ? 'En desarrollo' : 'Sin demo disponible';
+  const description = escapeHTML(repo.description || ui('noDescription'));
+  const status = repo.demoStatus === 'live' && safeDemo ? ui('demoLive') : repo.demoStatus === 'development' ? ui('development') : ui('noDemo');
   content.innerHTML = `
     <article class="project-detail-card">
       <header class="project-detail-header">
-        <span class="section-badge"><i class="fa-solid fa-layer-group"></i> FICHA DEL PROYECTO</span>
+        <span class="section-badge"><i class="fa-solid fa-layer-group"></i> ${escapeHTML(ui('projectOpen'))}</span>
         <h1>${title}</h1>
         <p>${description}</p>
         <div class="detail-meta">
@@ -989,15 +990,15 @@ function openProjectDetail(repoName, updateHistory = true) {
       </header>
       <section class="detail-gallery" aria-label="Capturas del proyecto">
         <h2>Capturas del proyecto</h2>
-        ${screenshots.length ? screenshots.map((src,index) => `<img src="${escapeHTML(src)}" alt="Captura ${index+1} de ${title}" loading="lazy">`).join('') : '<div class="detail-gallery-empty"><i class="fa-regular fa-images"></i><p>Las capturas de este proyecto se añadirán próximamente.</p></div>'}
+        ${screenshots.length ? screenshots.map((src,index) => `<img src="${escapeHTML(src)}" alt="Captura ${index+1} de ${title}" loading="lazy">`).join('') : '<div class="detail-gallery-empty"><i class="fa-regular fa-images"></i><p>${escapeHTML(ui('screenshotsSoon'))}</p></div>'}
       </section>
       <section class="detail-description">
-        <h2>Sobre este proyecto</h2><p>${description}</p>
-        <p>Última actualización: ${new Date(repo.updated_at).toLocaleDateString('es-ES')}</p>
+        <h2>${escapeHTML(ui('aboutProject'))}</h2><p>${description}</p>
+        <p>${document.documentElement.lang === 'en' ? 'Last updated:' : 'Última actualización:'} ${new Date(repo.updated_at).toLocaleDateString(document.documentElement.lang === 'en' ? 'en-US' : 'es-ES')}</p>
       </section>
       <div class="detail-actions">
-        ${safeRepo ? `<a class="btn-card-action btn-card-primary" href="${escapeHTML(safeRepo)}" target="_blank" rel="noopener noreferrer"><i class="fa-brands fa-github"></i> Ver código</a>` : ''}
-        ${safeDemo && repo.demoStatus === 'live' ? `<a class="btn-card-action btn-card-secondary" href="${escapeHTML(safeDemo)}" target="_blank" rel="noopener noreferrer"><i class="fa-solid fa-arrow-up-right-from-square"></i> Abrir demo</a>` : ''}
+        ${safeRepo ? `<a class="btn-card-action btn-card-primary" href="${escapeHTML(safeRepo)}" target="_blank" rel="noopener noreferrer"><i class="fa-brands fa-github"></i > ${escapeHTML(ui('code'))}</a>` : ''}
+        ${safeDemo && repo.demoStatus === 'live' ? `<a class="btn-card-action btn-card-secondary" href="${escapeHTML(safeDemo)}" target="_blank" rel="noopener noreferrer"><i class="fa-solid fa-arrow-up-right-from-square"></i > ${escapeHTML(ui('demo'))}</a>` : ''}
       </div>
     </article>`;
   if (projects) projects.hidden = true;
