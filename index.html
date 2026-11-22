@@ -71,6 +71,22 @@
         <span data-i18n="continue">Continuar</span>
         <i class="fa-solid fa-arrow-right"></i>
       </button>
+      <script>
+        // Independent fallback: keep the welcome action working even if app.js fails.
+        (() => {
+          const button = document.getElementById('btn-welcome-continue');
+          const overlay = document.getElementById('welcome-overlay');
+          if (button && overlay && !button.dataset.fallbackBound) {
+            button.dataset.fallbackBound = 'true';
+            button.addEventListener('click', () => {
+              overlay.classList.add('hidden');
+              overlay.setAttribute('aria-hidden', 'true');
+              overlay.setAttribute('inert', '');
+              document.querySelector('.app-container')?.removeAttribute('inert');
+            });
+          }
+        })();
+      </script>
     </div>
   </section>
 
