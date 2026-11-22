@@ -26,3 +26,5 @@ if(!document.querySelector('script[type="application/ld+json"]')){const s=docume
 }
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init,{once:true});else init();
 })();
+
+// Cloudflare Pages preview deployment trigger.
