@@ -485,6 +485,7 @@ function initTheme() {
 // ==========================================================================
 async function fetchGitHubRepos(forceNotify = false) {
   const syncBtn = document.getElementById('btn-sync-github');
+  state.lastSync = Date.now();
   if (syncBtn) syncBtn.classList.add('loading');
 
   try {
@@ -538,6 +539,10 @@ async function fetchGitHubRepos(forceNotify = false) {
       updateStats();
       renderFilterChips();
       renderProjects();
+      if (location.hash.startsWith('#project/')) {
+        const routeName = decodeURIComponent(location.hash.slice(9));
+        if (state.repos.some(repo => repo.name === routeName)) openProjectDetail(routeName, false);
+      }
 
       if (forceNotify) {
         showToast('Repositorios sincronizados con GitHub', 'fa-github');
@@ -680,8 +685,9 @@ function renderProjects() {
       const inDesc = (repo.description || '').toLowerCase().includes(q);
       const inLang = (repo.language || '').toLowerCase().includes(q);
       const inTopics = (repo.topics || []).some(t => t.toLowerCase().includes(q));
+      const inCategory = (repo.category || '').toLowerCase().includes(q);
 
-      if (!inName && !inDesc && !inLang && !inTopics) {
+      if (!inName && !inDesc && !inLang && !inTopics && !inCategory) {
         return false;
       }
     }
@@ -953,7 +959,7 @@ function initScrollAndNav() {
 }
 
 
-function openProjectDetail(repoName) {
+function openProjectDetail(repoName, updateHistory = true) {
   const repo = state.repos.find(item => item.name === repoName);
   if (!repo) return;
   const detail = document.getElementById('project-detail');
@@ -997,7 +1003,7 @@ function openProjectDetail(repoName) {
   if (controls) controls.hidden = true;
   if (hero) hero.hidden = true;
   detail.hidden = false;
-  history.pushState({ project: repo.name }, '', `#project/${encodeURIComponent(repo.name)}`);
+  if (updateHistory) history.pushState({ project: repo.name }, '', `#project/${encodeURIComponent(repo.name)}`);
   window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 function closeProjectDetail(updateHistory = true) {
@@ -1026,13 +1032,13 @@ function initProjectDetails() {
     const match = location.hash.match(/^#project\/(.+)$/);
     if (match) {
       const name = decodeURIComponent(match[1]);
-      if (state.repos.some(repo => repo.name === name)) openProjectDetail(name);
+      if (state.repos.some(repo => repo.name === name)) openProjectDetail(name, false);
     } else closeProjectDetail(false);
   });
   if (location.hash.startsWith('#project/')) {
     const name = decodeURIComponent(location.hash.slice(9));
     const repo = state.repos.find(item => item.name === name);
-    if (repo) openProjectDetail(name);
+    if (repo) openProjectDetail(name, false);
   }
 }
 function initAutomaticGitHubSync() {
