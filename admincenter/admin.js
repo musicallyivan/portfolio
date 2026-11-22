@@ -31,7 +31,38 @@ function renderExperience(){const items=getContent().timeline,root=$('experience
 document.querySelectorAll('[data-view]').forEach(a=>a.addEventListener('click',()=>navigate(a.dataset.view)));
 document.querySelectorAll('[data-go]').forEach(a=>a.addEventListener('click',()=>navigate(a.dataset.go)));
 $('menu-toggle').addEventListener('click',()=>$('sidebar').classList.toggle('open'));
-$('publish-pr').addEventListener('click',async()=>{const button=$('publish-pr');const original=button.innerHTML;button.disabled=true;button.textContent=tr('creatingPR');try{const d=getContent();d.headline=$('headline').value.trim();d.bio=$('bio').value.trim();saveContent(d);const response=await fetch('/api/publish',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify(d)});const result=await response.json();if(!response.ok)throw new Error(result.error||'Error de publicación');toast(tr('prCreated').replace('{number}',result.number));window.open(result.url,'_blank','noopener');}catch(error){toast(error.message||tr('publishError'))}finally{button.disabled=false;button.innerHTML=original}});
+$('publish-pr').addEventListener('click',async()=>{
+ const button=$('publish-pr'),original=button.innerHTML;
+ const draft=getContent();
+ draft.headline=$('headline').value.trim();
+ draft.bio=$('bio').value.trim();
+ let current={profile:{headline:'',bio:''},timeline:[]};
+ try{
+  const response=await fetch('/content/site-content.json',{cache:'no-store'});
+  if(response.ok){const data=await response.json();current={profile:data.profile||current.profile,timeline:Array.isArray(data.timeline)?data.timeline:[]}}
+ }catch(error){toast(document.documentElement.lang==='en'?'Could not load the published version for comparison.':'No se pudo cargar la versión publicada para comparar.');return}
+ const effective={
+  headline:draft.headline||current.profile.headline||'',
+  bio:draft.bio||current.profile.bio||'',
+  timeline:draft.timeline.length?draft.timeline:current.timeline
+ };
+ const changes=[];
+ if(effective.headline!==(current.profile.headline||''))changes.push((document.documentElement.lang==='en'?'Headline: ':'Titular: ')+(effective.headline||'—'));
+ if(effective.bio!==(current.profile.bio||''))changes.push((document.documentElement.lang==='en'?'Biography: ':'Biografía: ')+(effective.bio||'—'));
+ if(JSON.stringify(effective.timeline)!==JSON.stringify(current.timeline))changes.push((document.documentElement.lang==='en'?'Timeline: ':'Trayectoria: ')+effective.timeline.length+(document.documentElement.lang==='en'?' entries':' elementos'));
+ if(!changes.length){toast(document.documentElement.lang==='en'?'There are no changes to publish.':'No hay cambios que publicar.');return}
+ const summary=(document.documentElement.lang==='en'?'Review proposed changes before creating the Pull Request:\n\n':'Revisa los cambios propuestos antes de crear la Pull Request:\n\n')+changes.map(x=>'• '+x).join('\n')+'\n\n'+(document.documentElement.lang==='en'?'Empty headline or biography fields will keep their current published values. Continue?':'Los campos de titular o biografía vacíos conservarán sus valores publicados actuales. ¿Continuar?');
+ if(!window.confirm(summary))return;
+ button.disabled=true;button.textContent=tr('creatingPR');
+ try{
+  const response=await fetch('/api/publish',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify(draft)});
+  const result=await response.json();
+  if(!response.ok)throw new Error(result.error||tr('publishError'));
+  toast(tr('prCreated').replace('{number}',result.number));
+  window.open(result.url,'_blank','noopener');
+ }catch(error){toast(error.message||tr('publishError'))}
+ finally{button.disabled=false;button.innerHTML=original}
+});
 $('headline').addEventListener('input',countFields);$('bio').addEventListener('input',countFields);
 $('save-profile').addEventListener('click',()=>{const d=getContent();d.headline=$('headline').value.trim();d.bio=$('bio').value.trim();saveContent(d);$('profile-status').textContent=tr('savedBrowser');toast(tr('profileSaved'))});
 $('experience-form').addEventListener('submit',e=>{e.preventDefault();const d=getContent();d.timeline.push({title:$('exp-title').value.trim(),period:$('exp-period').value.trim(),description:$('exp-description').value.trim()});saveContent(d);e.target.reset();renderExperience();$('metric-timeline').textContent=d.timeline.length;toast(tr('addedDraft'))});
