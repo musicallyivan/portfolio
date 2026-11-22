@@ -2068,3 +2068,71 @@ body.mobile-drawer-open {
 .detail-gallery-empty { grid-column:1/-1; min-height:180px; display:grid; place-content:center; text-align:center; gap:.6rem; border:1px dashed var(--glass-border); border-radius:var(--radius-lg); color:var(--text-muted); }
 .detail-gallery-empty i { font-size:2rem; }
 .detail-description { max-width:850px; margin-inline:auto; }
+
+/* Mobile toolbar refinements */
+@media (max-width: 480px) {
+  .controls-glass {
+    gap: 0.85rem;
+  }
+
+  .search-and-sync-row {
+    gap: 0.7rem;
+  }
+
+  /* The desktop flex-basis was reserving 260px of vertical space on phones. */
+  .search-box-wrapper {
+    flex: 0 1 auto;
+    width: 100%;
+    min-width: 0;
+  }
+
+  .search-input {
+    display: block;
+    width: 100%;
+    min-height: 48px;
+  }
+
+  .search-box-wrapper i.search-icon {
+    top: 50%;
+    left: 1rem;
+  }
+
+  .controls-aux {
+    width: 100%;
+    display: flex;
+    align-items: stretch;
+    gap: 0.55rem;
+  }
+
+  .custom-select {
+    min-width: 0;
+    flex: 1 1 0;
+    padding-inline: 0.8rem;
+  }
+
+  .btn-sync-github {
+    flex: 0 0 auto;
+    padding-inline: 0.85rem;
+  }
+
+  .filter-chips-scroll-container {
+    width: 100%;
+    max-width: 100%;
+    overflow-x: auto;
+    overscroll-behavior-x: contain;
+    scroll-snap-type: x proximity;
+    padding-bottom: 0.25rem;
+  }
+
+  .filter-chip {
+    flex: 0 0 auto;
+    scroll-snap-align: start;
+  }
+
+  .btn-floating-top {
+    width: 38px;
+    height: 38px;
+    right: max(0.75rem, var(--sar));
+    bottom: calc(0.75rem + var(--sab));
+  }
+}
