@@ -8,7 +8,27 @@
 // 1. REPOSITORIES DATABASE & CURATED METADATA
 // ==========================================================================
 const GITHUB_USERNAME = 'musicallyivan';
-const PORTFOLIO_UI={es:{all:'Todos',featured:'Destacados',demos:'Demos',applications:'Aplicaciones',shown:(n,t)=>'Mostrando '+n+' de '+t+' proyectos',emptyTitle:'No se encontraron proyectos',emptyDesc:'Intenta buscar con otros términos o limpia los filtros activos.',reset:'Restablecer filtros',demoLive:'Demo disponible',development:'En desarrollo',noDemo:'Sin demo',public:'Público',details:'Detalles',demo:'Demo',code:'Código',dark:'Modo Oscuro activado',light:'Modo Claro activado',syncDone:'Repositorios sincronizados con GitHub',syncCache:'Mostrando versión optimizada en caché',cloneInvalid:'URL de repositorio no válida',clipboardUnavailable:'El portapapeles no está disponible en este navegador',cloneCopied:'Comando git clone copiado',copyError:'Error al copiar al portapapeles'},en:{all:'All',featured:'Featured',demos:'Demos',applications:'Applications',shown:(n,t)=>'Showing '+n+' of '+t+' projects',emptyTitle:'No projects found',emptyDesc:'Try different search terms or clear the active filters.',reset:'Reset filters',demoLive:'Demo available',development:'In development',noDemo:'No demo',public:'Public',details:'Details',demo:'Demo',code:'Code',dark:'Dark mode enabled',light:'Light mode enabled',syncDone:'Repositories synced with GitHub',syncCache:'Showing optimized cached version',cloneInvalid:'Invalid repository URL',clipboardUnavailable:'Clipboard is unavailable in this browser',cloneCopied:'Git clone command copied',copyError:'Could not copy to clipboard'}};\nfunction ui(k){return (PORTFOLIO_UI[document.documentElement.lang==='en'?'en':'es'][k]||PORTFOLIO_UI.es[k]||k)}
+const PORTFOLIO_UI={es:{all:'Todos',featured:'Destacados',demos:'Demos',applications:'Aplicaciones',shown:(n,t)=>'Mostrando '+n+' de '+t+' proyectos',emptyTitle:'No se encontraron proyectos',emptyDesc:'Intenta buscar con otros términos o limpia los filtros activos.',reset:'Restablecer filtros',demoLive:'Demo disponible',development:'En desarrollo',noDemo:'Sin demo',public:'Público',details:'Detalles',demo:'Demo',code:'Código',dark:'Modo Oscuro activado',light:'Modo Claro activado',syncDone:'Repositorios sincronizados con GitHub',syncCache:'Mostrando versión optimizada en caché',cloneInvalid:'URL de repositorio no válida',clipboardUnavailable:'El portapapeles no está disponible en este navegador',cloneCopied:'Comando git clone copiado',copyError:'Error al copiar al portapapeles'},en:{all:'All',featured:'Featured',demos:'Demos',applications:'Applications',shown:(n,t)=>'Showing '+n+' of '+t+' projects',emptyTitle:'No projects found',emptyDesc:'Try different search terms or clear the active filters.',reset:'Reset filters',demoLive:'Demo available',development:'In development',noDemo:'No demo',public:'Public',details:'Details',demo:'Demo',code:'Code',dark:'Dark mode enabled',light:'Light mode enabled',syncDone:'Repositories synced with GitHub',syncCache:'Showing optimized cached version',cloneInvalid:'Invalid repository URL',clipboardUnavailable:'Clipboard is unavailable in this browser',cloneCopied:'Git clone command copied',copyError:'Could not copy to clipboard'}};\nconst PROJECT_DESCRIPTIONS_EN = {
+mediaflow:'A Windows and web application for converting, trimming and processing audio, video and image files into multiple formats using high-performance FFmpeg.',
+SpiritDex:'An interactive encyclopedia and Pokédex with a futuristic interface, instant search by type and generation, base-stat calculations and smooth creature animations.',
+'Marvel-Tracker':'An interactive platform for exploring the Marvel Cinematic Universe timeline, including films, Disney+ series, phases, release dates and detailed information.',
+'insidious-tracker':'An interactive chronological guide to the Insidious horror franchise, featuring film connections, characters, entities and watch tracking.',
+'trackers-hub':'A central hub for tracking tools, dashboards and interactive collections for TV, movies and projects, presented with a minimal glassmorphism interface.',
+'musicallyivan-web':'A fast personal website and portfolio built with Astro and Tailwind CSS, focused on Core Web Vitals, performance and responsive design.',
+'plugin.video.streamhub':'A multimedia add-on and entertainment platform for Kodi, supporting HD streams, channel organization and metadata management.',
+'youtube-mp3-downloader':'A Python script and tool for extracting, converting and downloading high-quality MP3 audio from YouTube videos.',
+MyVLC:'A native desktop media player built with C# and .NET, featuring hardware acceleration, subtitles, playlists and an audio equalizer.',
+'iesmusicallyivan-app':'A native iOS mobile application built with Swift, following Apple Human Interface Guidelines and modern architecture.',
+'EJEMPLOS-PYTHON':'An educational repository with practical examples of algorithms, data structures, file handling, object-oriented programming and Python automation scripts.',
+archivo_secreto:'An interactive vintage mystery-themed website for preserving, displaying and reading digital letters with animated effects.',
+'mcu-database':'A structured JSON database covering the Marvel Studios canon, including timelines, directors, actors, box office data and appearances.',
+taskapp_by_ivan:'An interactive task and productivity manager with local storage, labels, due dates and priority management.',
+elementun:'A toolkit of automation utilities for recurring tasks, text processing and workflow optimization.',
+musicallyivannew:'A CSS experimentation space for testing Grid, Flexbox, visual effects and interface micro-interactions.',
+musicallyivan:'The configuration and visual design of the main GitHub profile, with dynamic metrics, language statistics and a professional presentation.'
+};
+function projectDescription(repo){if(document.documentElement.lang==='en'&&PROJECT_DESCRIPTIONS_EN[repo.name])return PROJECT_DESCRIPTIONS_EN[repo.name];return repo.description||ui('noDescription')}
+function ui(k){return (PORTFOLIO_UI[document.documentElement.lang==='en'?'en':'es'][k]||PORTFOLIO_UI.es[k]||k)}
 function categoryName(v){const map={Aplicaciones:'applications'};return map[v]?ui(map[v]):v}\nwindow.addEventListener('portfolio:languagechange',()=>{renderFilterChips();renderProjects()});\n
 
 // Detailed data for all repositories with rich descriptions and live URLs
@@ -733,7 +753,7 @@ function renderProjects() {
     const repoUrl = safeExternalUrl(repo.html_url, { githubOnly: true });
     const demoUrl = safeExternalUrl(repo.homepage);
     const title = escapeHTML(repo.title || repo.name);
-    const description = escapeHTML(repo.description || '');
+    const description = escapeHTML(projectDescription(repo));
     const language = escapeHTML(repo.language || 'Código');
     const icon = escapeHTML(repo.icon || 'fa-solid fa-code-branch');
     const topics = (Array.isArray(repo.topics) ? repo.topics : [])
@@ -973,7 +993,7 @@ function openProjectDetail(repoName, updateHistory = true) {
   const safeDemo = safeExternalUrl(repo.homepage);
   const screenshots = (repo.screenshots || []).map(safeExternalUrl).filter(Boolean);
   const title = escapeHTML(repo.title || repo.name);
-  const description = escapeHTML(repo.description || ui('noDescription'));
+  const description = escapeHTML(projectDescription(repo));
   const status = repo.demoStatus === 'live' && safeDemo ? ui('demoLive') : repo.demoStatus === 'development' ? ui('development') : ui('noDemo');
   content.innerHTML = `
     <article class="project-detail-card">
