@@ -68,9 +68,12 @@ export async function onRequestPost({ request, env }) {
   if (!env.GITHUB_TOKEN) return json({ error: "Falta configurar el secreto GITHUB_TOKEN en Cloudflare Pages." }, 503);
   let input;
   try { input = await request.json(); } catch { return json({ error: "JSON no válido." }, 400); }
-  const headline = String(input.headline || "").trim().slice(0, 120);
-  const bio = String(input.bio || "").trim().slice(0, 600);
-  if (!Array.isArray(input.timeline) || input.timeline.length > 100) return json({ error: "La trayectoria no tiene un formato válido." }, 400);
+  if (typeof input.headline !== "string" || typeof input.bio !== "string" ||
+      !Array.isArray(input.timeline) || input.timeline.length > 100) {
+    return json({ error: "Los datos del perfil o la trayectoria no tienen un formato válido." }, 400);
+  }
+  const requestedHeadline = input.headline.trim().slice(0, 120);
+  const requestedBio = input.bio.trim().slice(0, 600);
   const timeline = input.timeline.map(item => ({
     title: String(item.title || "").trim().slice(0, 100),
     period: String(item.period || "").trim().slice(0, 60),
@@ -79,7 +82,18 @@ export async function onRequestPost({ request, env }) {
   if (timeline.some(item => !item.title)) return json({ error: "Cada elemento de la trayectoria necesita un título." }, 400);
 
   const owner = "musicallyivan", repo = "portfolio", base = "main";
-  const stamp = new Date().toISOString().replace(/[-:]/g, "").replace(/\.\d{3}Z$/, "Z").toLowerCase();
+  let currentDocument = { profile: { headline: "", bio: "" }, timeline: [] };
+  try {
+    const current = await github("/repos/" + owner + "/" + repo + "/contents/content/site-content.json?ref=" + base, env.GITHUB_TOKEN);
+    const decoded = atob(String(current.content || "").replace(/\\n/g, ""));
+    const bytes = Uint8Array.from(decoded, c => c.charCodeAt(0));
+    currentDocument = JSON.parse(new TextDecoder().decode(bytes));
+  } catch (error) {
+    if (!String(error.message).includes("Not Found")) throw error;
+  }
+  // Empty form fields mean "not supplied", never "delete published content".
+  const headline = requestedHeadline || String(currentDocument.profile?.headline || "").slice(0, 120);
+  const bio = requestedBio || String(currentDocument.profile?.bio || "").slice(0, 600);
   const branch = "admincenter/content-" + stamp;
   const api = "/repos/" + owner + "/" + repo;
   try {
